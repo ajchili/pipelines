@@ -25,6 +25,7 @@ import { ROCCurveConfig } from '../components/viewers/ROCCurve';
 import { TensorboardViewerConfig } from '../components/viewers/Tensorboard';
 import { csvParseRows } from 'd3-dsv';
 import { logger, errorToMessage } from './Utils';
+import { PythonVisViewerConfig } from 'src/components/viewers/PythonVisViewer';
 
 export interface PlotMetadata {
   format?: 'csv';
@@ -80,6 +81,8 @@ export class OutputArtifactLoader {
             return await this.buildHtmlViewerConfig(metadata);
           case (PlotType.ROC):
             return await this.buildRocCurveConfig(metadata);
+          case (PlotType.PYTHON_VIS):
+            return await this.buildPythonVisViewer(metadata);
           default:
             logger.error('Unknown plot type: ' + metadata.type);
             return null;
@@ -191,6 +194,25 @@ export class OutputArtifactLoader {
     return {
       htmlContent,
       type: PlotType.WEB_APP,
+    };
+  }
+
+  public static async buildPythonVisViewer(metadata: PlotMetadata): Promise<PythonVisViewerConfig> {
+    if (!metadata.source) {
+      throw new Error('Malformed metadata, property "source" is required.');
+    }
+    const path = WorkflowParser.parseStoragePath(metadata.source);
+    const htmlContent = await Apis.readFile(path);
+
+    return {
+      // Fixes issue with TFDV (and potentially other TFX components) where
+      // the method in which javascript interacts with embedded iframes is not
+      // allowed when embedded in an additional iframe.
+      // This is resolved by setting the srcdoc value rather that manipulating
+      // the document drectly.
+      // https://javascript.info/cross-window-communication#accessing-an-iframe-contents
+      htmlContent: htmlContent.replace('contentWindow.document.write', 'srcdoc='),
+      type: PlotType.PYTHON_VIS
     };
   }
 

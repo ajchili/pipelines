@@ -21,6 +21,7 @@ import MarkdownViewer from './MarkdownViewer';
 import PagedTable from './PagedTable';
 import ROCCurve from './ROCCurve';
 import TensorboardViewer from './Tensorboard';
+import PythonVisViewer from './PythonVisViewer';
 import { PlotType, ViewerConfig } from './Viewer';
 
 export const componentMap = {
@@ -30,6 +31,7 @@ export const componentMap = {
   [PlotType.TABLE]: PagedTable,
   [PlotType.TENSORBOARD]: TensorboardViewer,
   [PlotType.WEB_APP]: HTMLViewer,
+  [PlotType.PYTHON_VIS]: PythonVisViewer,
 };
 
 interface ViewerContainerProps {

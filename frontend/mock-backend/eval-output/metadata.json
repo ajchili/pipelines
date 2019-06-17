@@ -32,6 +32,11 @@
       ],
       "source": "gs://bucket/table.csv",
       "type": "table"
+    },
+    {
+      "type": "python-vis",
+      "source": "gs://bucket/python-vis.html",
+      "storage": "gcs"
     }
   ]
 }

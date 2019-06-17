@@ -32,6 +32,7 @@ const rocMetadataJsonPath2 = './eval-output/metadata2.json';
 const rocDataPath = './eval-output/roc.csv';
 const rocDataPath2 = './eval-output/roc2.csv';
 const tableDataPath = './eval-output/table.csv';
+const pythonDataPath = './eval-output/python-vis.html';
 
 const confusionMatrixMetadataJsonPath = './model-output/metadata.json';
 const confusionMatrixPath = './model-output/confusion_matrix.csv';
@@ -551,6 +552,8 @@ export default (app: express.Application) => {
       res.sendFile(_path.resolve(__dirname, rocMetadataJsonPath));
     } else if (key === 'model2') {
       res.sendFile(_path.resolve(__dirname, rocMetadataJsonPath2));
+    } else if (key === 'python-vis.html') {
+      res.sendFile(_path.resolve(__dirname, pythonDataPath));
     } else {
       // TODO: what does production return here?
       res.send('dummy file for key: ' + key);
