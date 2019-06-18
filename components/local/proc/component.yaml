@@ -1,0 +1,19 @@
+name: Python ROC curve
+description: Calculates Receiver Operating Characteristics curve and generates Bohek visualization.
+inputs:
+  - {name: Predictions dir, type: GSCPath, description: 'GSC path of prediction file pattern.'}
+  - {name: True class, type: String, default: 'true', description: 'The true class label for the sample. Default is "true".'}
+  - {name: True score column, type: String, default: '', description: 'The name of the column for positive probability.'}
+  - {name: Target lambda, type: String, default: '', description: 'Text of Python lambda function which returns boolean value indicating whether the classificiation result is correct.\nFor example, "lambda x: x[''a''] and x[''b'']". If missing, input must have a "target" column.'}
+  - {name: Output dir, type: GCSPath, description: 'GSC path of the output directory.'}
+implementation:
+  container:
+    image: 'gcr.io/kirinpatel/ml-pipeline-local-proc'
+    command: [python, /pipelines/component/src/proc.py]
+    args: [
+      --predictions, {inputValue: Predictions dir},
+      --trueclass, {inputValue: True class},
+      --true_score_column, {inputValue: True score column},
+      --target_lambda, {inputValue: Target lambda},
+      --output, {inputValue: Output dir}
+    ]
