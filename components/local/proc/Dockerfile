@@ -18,8 +18,11 @@ RUN mkdir /usr/licenses && \
     /ml/license.sh /ml/third_party_licenses.csv /usr/licenses
 
 RUN pip install traitlets
+RUN pip install jupyter_client
 RUN pip install nbconvert
 RUN pip install nbformat
+RUN pip install ipykernel
+RUN pip install bokeh
 
 COPY ./src /pipelines/component/src
 

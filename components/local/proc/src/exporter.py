@@ -10,7 +10,7 @@ from nbformat.v4 import new_notebook, new_code_cell
 # lines of code from the python file.
 #
 # Returns the generated Notebook
-def code_to_notebook(filename):
+def code_to_notebook(filename, data_path):
     filename = os.path.join(os.getcwd(), filename)
     nb = new_notebook()
     with open(filename, 'r') as f:
@@ -27,7 +27,7 @@ def generate_html_from_notebook(nb, type='full'):
     html_exporter.template_file = type
 
     # Output generator object
-    ep = ExecutePreprocessor(timeout=300, kernel_name='python3')
+    ep = ExecutePreprocessor(timeout=300, kernel_name='python2')
     # If the directory does not exist this will fail
     ep.preprocess(nb, {'metadata': {'path': '/'}})
 

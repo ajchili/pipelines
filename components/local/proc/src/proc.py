@@ -31,12 +31,44 @@ def main(argv=None):
     if not on_cloud and not os.path.exists(args.output):
         os.makedirs(args.output)
 
-    html_file = os.path.join(args.output, '/pipelines/component/src/test.html')
+    schema_file = os.path.join(
+        os.path.dirname(args.predictions), 'schema.json')
+    schema = json.loads(file_io.read_file_to_string(schema_file))
+    names = [x['name'] for x in schema]
+
+   if not args.target_lambda and 'target' not in names:
+        raise ValueError(
+            'There is no "target" column, and target_lambda is not provided.')
+
+    if args.true_score_column not in names:
+        raise ValueError('Cannot find column name "%s"' %
+                         args.true_score_column)
+
+    dfs = []
+    files = file_io.get_matching_files(args.predictions)
+    for file in files:
+        with file_io.FileIO(file, 'r') as f:
+            dfs.append(pd.read_csv(f, names=names))
+
+    df = pd.concat(dfs)
+    if args.target_lambda:
+        df['target'] = df.apply(eval(args.target_lambda), axis=1)
+    else:
+        df['target'] = df['target'].apply(
+            lambda x: 1 if x == args.trueclass else 0)
+    fpr, tpr, thresholds = roc_curve(df['target'], df[args.true_score_column])
+    roc_auc = roc_auc_score(df['target'], df[args.true_score_column])
+    df_roc = pd.DataFrame({'fpr': fpr, 'tpr': tpr, 'thresholds': thresholds})
+    roc_file = os.path.join(args.output, 'roc.csv')
+    with file_io.FileIO(roc_file, 'w') as f:
+        df_roc.to_csv(f, columns=['fpr', 'tpr',
+                                  'thresholds'], header=False, index=False)
+
+    html_file = os.path.join(args.output, 'roc.html')
     nb = exporter.code_to_notebook('/pipelines/component/src/test.py')
     body = exporter.generate_html_from_notebook(nb)
-    os.open(html_file, 'w')
-    os.write(body)
-
+    with file_io.FileIO(html_file, "w+") as f:
+        f.write(body)
 
     metadata = {
         'outputs': [{
