@@ -23,7 +23,6 @@ from minio import Minio
 from minio.error import (ResponseError, BucketAlreadyOwnedByYou,
                          BucketAlreadyExists)
 import exporter
-import sys
 
 
 def ensure_bucket_exists_or_raise(minio_client=None):
@@ -44,13 +43,12 @@ def main(argv=None):
     # minio client use these to retrieve minio objects/artifacts
     minio_access_key = "minio"
     minio_secret_key = "minio123"
-    minio_host = "minio-service"
-    minio_namespace = "kubeflow"
+    minio_host = os.getenv("MINIO_SERVICE_SERVICE_HOST", "0.0.0.0")
+    minio_port = os.getenv("MINIO_SERVICE_SERVICE_PORT", "9000")
     # construct minio endpoint from host and namespace (optional)
-    minio_endpoint = "{}.{}".format(minio_host, minio_namespace) if len(
-        minio_namespace) > 0 else minio_host
+    minio_endpoint = "{}:{}".format(minio_host, minio_port)
 
-    minio_client = Minio("10.59.254.118:9000",
+    minio_client = Minio(minio_endpoint,
                          access_key=minio_access_key,
                          secret_key=minio_secret_key,
                          secure=False)
