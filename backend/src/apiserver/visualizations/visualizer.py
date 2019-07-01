@@ -18,6 +18,7 @@ from nbformat.v4 import new_notebook
 from minio import Minio
 from minio.error import (ResponseError, BucketAlreadyOwnedByYou,
                          BucketAlreadyExists)
+import datetime
 import exporter
 
 
@@ -55,6 +56,8 @@ def main(argv=None):
                         help='The name of the column for positive probability.')
     args = parser.parse_args()
 
+    print(str(datetime.datetime.now()))
+
     # minio client use these to retrieve minio objects/artifacts
     minio_access_key = 'minio'
     minio_secret_key = 'minio123'
@@ -63,21 +66,35 @@ def main(argv=None):
     # construct minio endpoint from host and namespace (optional)
     minio_endpoint = '{}:{}'.format(minio_host, minio_port)
 
+    print(str(datetime.datetime.now()))
+
     minio_client = Minio(minio_endpoint,
                          access_key=minio_access_key,
                          secret_key=minio_secret_key,
                          secure=False)
 
+    print(str(datetime.datetime.now()))
+
     ensure_bucket_exists_or_raise(minio_client)
 
     nb = new_notebook()
+
+    print(str(datetime.datetime.now()))
     nb.cells.append(exporter.create_cell_from_args(args))
+
+    print(str(datetime.datetime.now()))
     nb.cells.append(exporter.create_cell_from_file('./{}.py'.format(args.type)))
+
+    print(str(datetime.datetime.now()))
     html = exporter.generate_html_from_notebook(nb)
+
+    print(str(datetime.datetime.now()))
     output_path = os.path.join(os.getcwd(), 'output.html')
     output = open(output_path, 'w')
     output.write(html)
     output.close()
+
+    print(str(datetime.datetime.now()))
 
     # Upload artifact to minio
     try:
@@ -90,6 +107,7 @@ def main(argv=None):
     except ResponseError as err:
         raise
 
+    print(str(datetime.datetime.now()))
 
 if __name__ == '__main__':
     main()

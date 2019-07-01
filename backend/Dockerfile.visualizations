@@ -35,4 +35,4 @@ WORKDIR /src
 
 COPY ./src/apiserver/visualizations /src
 
-ENTRYPOINT [ "python3", "visualizer.py" ]
+ENTRYPOINT [ "python3", "visualizer.py", "--predictions", "gs://kirinpatel/tfx-taxi-cab-classification-pipeline-example-s8726/predict/prediction_results-*", "--target_lambda", "lambda x: (x['target'] > x['fare'] * 0.2)" ]
