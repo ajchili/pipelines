@@ -15,7 +15,29 @@
 import os
 from nbconvert import HTMLExporter
 from nbconvert.preprocessors import ExecutePreprocessor
-from nbformat.v4 import new_code_cell
+from nbformat.v4 import new_code_cell, new_notebook
+from jupyter_client import KernelManager
+
+
+# Create custom KernelManager
+# This will circumvent issues where kernel is shutdown after preprocessing. Due
+# to the shutdown, latency is introduced because a kernel must be started per
+# visualization.
+km = KernelManager()
+km.start_kernel()
+ep = ExecutePreprocessor(timeout=300, kernel_name='python3')
+# Warm up preprocessor
+ep.preprocess(new_notebook(), {'metadata': {'path': os.getcwd()}}, km)
+
+
+def create_cell_to_reset_args():
+    variables = """
+    trueclass = "true"
+    predictions = None
+    target_lambda = None
+    true_score_column = "true"
+    """
+    return new_code_cell(variables)
 
 
 # Takes provided command line arguments and creates a Notebook cell object with
@@ -53,11 +75,13 @@ def generate_html_from_notebook(nb):
     html_exporter = HTMLExporter()
     html_exporter.template_file = os.path.join(os.getcwd(),
                                                'templates/full.tpl')
-
     # Output generator object
-    ep = ExecutePreprocessor(timeout=300, kernel_name='python')
-    ep.preprocess(nb, {'metadata': {'path': os.getcwd()}})
+    ep.preprocess(nb, {'metadata': {'path': os.getcwd()}}, km)
 
     # Export all html and outputs
     (body, _) = html_exporter.from_notebook_node(nb)
     return body
+
+
+def shutdown_kernel():
+    km.shutdown_kernel()
