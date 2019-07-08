@@ -14,11 +14,27 @@
 
 import argparse
 import os
+import shlex
 from nbformat.v4 import new_notebook
 from minio import Minio
 from minio.error import (ResponseError, BucketAlreadyOwnedByYou,
                          BucketAlreadyExists)
 import exporter
+
+
+def create_minio_client():
+    # minio client use these to retrieve minio objects/artifacts
+    minio_access_key = 'minio'
+    minio_secret_key = 'minio123'
+    minio_host = os.getenv('MINIO_SERVICE_SERVICE_HOST', '0.0.0.0')
+    minio_port = os.getenv('MINIO_SERVICE_SERVICE_PORT', '9000')
+    # construct minio endpoint from host and namespace (optional)
+    minio_endpoint = '{}:{}'.format(minio_host, minio_port)
+
+    return Minio(minio_endpoint,
+                 access_key=minio_access_key,
+                 secret_key=minio_secret_key,
+                 secure=False)
 
 
 def ensure_bucket_exists_or_raise(minio_client):
@@ -33,6 +49,23 @@ def ensure_bucket_exists_or_raise(minio_client):
         pass
     except BucketAlreadyExists as err:
         pass
+    except ResponseError as err:
+        raise
+
+
+def save_visualization_to_minio(minio_client, html):
+    output_path = os.path.join(os.getcwd(), 'output.html')
+    output = open(output_path, 'w')
+    output.write(html)
+    output.close()
+
+    try:
+        with open(output_path, 'rb') as file_data:
+            file_stat = os.stat(output_path)
+            # add some sort of id to the visualization html file
+            minio_client.put_object('mlpipeline-visualizations', 'object.html',
+                                    file_data, file_stat.st_size,
+                                    content_type='text/html')
     except ResponseError as err:
         raise
 
@@ -53,46 +86,20 @@ def main(argv=None):
                              'x[\'a\'] and x[\'b\']".')
     parser.add_argument('--true_score_column', type=str, default='true',
                         help='The name of the column for positive probability.')
-    args = parser.parse_args()
 
-    # minio client use these to retrieve minio objects/artifacts
-    minio_access_key = 'minio'
-    minio_secret_key = 'minio123'
-    minio_host = os.getenv('MINIO_SERVICE_SERVICE_HOST', '0.0.0.0')
-    minio_port = os.getenv('MINIO_SERVICE_SERVICE_PORT', '9000')
-    # construct minio endpoint from host and namespace (optional)
-    minio_endpoint = '{}:{}'.format(minio_host, minio_port)
+    minio_client = create_minio_client()
+    # ensure_bucket_exists_or_raise(minio_client)
 
+    while True:
+        # TODO: Create custom parser that does not exit on invalid arguments
+        args = parser.parse_args(shlex.split(input()))
+        nb = new_notebook()
+        nb.cells.append(exporter.create_cell_from_args(args))
+        nb.cells.append(exporter.create_cell_from_file(
+            './{}.py'.format(args.type)))
+        html = exporter.generate_html_from_notebook(nb)
 
-    minio_client = Minio(minio_endpoint,
-                         access_key=minio_access_key,
-                         secret_key=minio_secret_key,
-                         secure=False)
-
-    ensure_bucket_exists_or_raise(minio_client)
-
-    nb = new_notebook()
-    nb.cells.append(exporter.create_cell_from_args(args))
-    nb.cells.append(exporter.create_cell_from_file('./{}.py'.format(args.type)))
-    html = exporter.generate_html_from_notebook(nb)
-
-    exporter.shutdown_kernel()
-
-    output_path = os.path.join(os.getcwd(), 'output.html')
-    output = open(output_path, 'w')
-    output.write(html)
-    output.close()
-
-    # Upload artifact to minio
-    try:
-        with open(output_path, 'rb') as file_data:
-            file_stat = os.stat(output_path)
-            # add some sort of id to the visualization html file
-            minio_client.put_object('mlpipeline-visualizations', 'object.html',
-                                    file_data, file_stat.st_size,
-                                    content_type='text/html')
-    except ResponseError as err:
-        raise
+        print(html)
 
 
 if __name__ == '__main__':
