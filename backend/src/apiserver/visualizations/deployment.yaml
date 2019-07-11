@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vis-server-deployment
+  namespace: kubeflow
+  labels:
+    app: vis-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vis-server
+  template:
+    metadata:
+      labels:
+        app: vis-server
+    spec:
+      containers:
+        - name: vis-server
+          image: gcr.io/kirinpatel/vis-server:v1
+          ports:
+            - containerPort: 8888
