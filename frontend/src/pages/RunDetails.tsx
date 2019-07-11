@@ -235,9 +235,8 @@ class RunDetails extends Page<RunDetailsProps, RunDetailsState> {
                                     onClick={() => {
                                       Apis.generateVisualization()
                                         .then((response: string) => {
-                                            // tslint:disable-next-line:no-console
                                             let json = JSON.parse(response);
-                                            if (selectedNodeDetails) {
+                                            if (selectedNodeDetails && json.html) {
                                               if (!selectedNodeDetails.viewerConfigs) {
                                                 selectedNodeDetails.viewerConfigs = [];
                                               }
