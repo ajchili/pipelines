@@ -30,16 +30,6 @@ ep = ExecutePreprocessor(timeout=300, kernel_name='python3')
 ep.preprocess(new_notebook(), {'metadata': {'path': os.getcwd()}}, km)
 
 
-def create_cell_to_reset_args():
-    variables = """
-    trueclass = "true"
-    predictions = None
-    target_lambda = None
-    true_score_column = "true"
-    """
-    return new_code_cell(variables)
-
-
 # Takes provided command line arguments and creates a Notebook cell object with
 # the arguments as variables.
 #
