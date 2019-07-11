@@ -16,6 +16,7 @@
 
 import * as React from 'react';
 import Banner, { Mode } from '../components/Banner';
+import Button from '@material-ui/core/Button';
 import Buttons from '../lib/Buttons';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import CompareTable from '../components/CompareTable';
@@ -39,7 +40,8 @@ import { OutputArtifactLoader } from '../lib/OutputArtifactLoader';
 import { Page } from './Page';
 import { RoutePage, RouteParams } from '../components/Router';
 import { ToolbarProps } from '../components/Toolbar';
-import { ViewerConfig } from '../components/viewers/Viewer';
+import { ViewerConfig, PlotType } from '../components/viewers/Viewer';
+import { HTMLViewerConfig } from '../components/viewers/HTMLViewer';
 import { Workflow } from '../../third_party/argo-ui/argo_template';
 import { classes, stylesheet } from 'typestyle';
 import { commonCss, padding, color, fonts, fontsize } from '../Css';
@@ -224,6 +226,36 @@ class RunDetails extends Page<RunDetailsProps, RunDetailsState> {
                                   </div>
                                 );
                               })}
+                              {(nodeInputOutputParams && nodeInputOutputParams[1] && nodeInputOutputParams[1].length) && (
+                                <div style={{
+                                  marginLeft: 16,
+                                  marginTop: 16,
+                                }}>
+                                  <Button
+                                    onClick={() => {
+                                      Apis.generateVisualization()
+                                        .then((response: string) => {
+                                            // tslint:disable-next-line:no-console
+                                            let json = JSON.parse(response);
+                                            if (selectedNodeDetails) {
+                                              if (!selectedNodeDetails.viewerConfigs) {
+                                                selectedNodeDetails.viewerConfigs = [];
+                                              }
+                                              selectedNodeDetails.viewerConfigs.push({
+                                                htmlContent: json.html,
+                                                type: PlotType.WEB_APP,
+                                              } as HTMLViewerConfig);
+                                              this.setState({ selectedNodeDetails });
+                                            }
+                                          })
+                                          // tslint:disable-next-line:no-console
+                                          .catch(console.warn);
+                                    }}
+                                  >
+                                    Generate Visualization
+                                  </Button>
+                                </div>
+                              )}
                             </div>
                           )}
 

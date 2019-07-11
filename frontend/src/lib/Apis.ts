@@ -154,6 +154,25 @@ export class Apis {
     return this._fetch('system/project-id');
   }
 
+  public static async generateVisualization(): Promise<string> {
+    return this._fetch('/visualizations', v1beta1Prefix, '', {
+      body: JSON.stringify({
+        'arguments': [
+          '--target_lambda "lambda x: (x[\'target\'] > x[\'fare\'] * 0.2)"'
+        ],
+        'inputPath': 'gs://kirinpatel/tfx-taxi-cab-classification-pipeline-example-s8726/predict/prediction_results-*',
+        'type': 0,
+      }),
+      cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      method: 'POST', // *GET, POST, PUT, DELETE, etc.
+      // mode: 'cors', // no-cors, cors, *same-origin
+    });
+  }
+
   private static _experimentServiceApi?: ExperimentServiceApi;
   private static _jobServiceApi?: JobServiceApi;
   private static _pipelineServiceApi?: PipelineServiceApi;
