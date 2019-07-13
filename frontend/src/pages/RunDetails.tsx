@@ -233,9 +233,17 @@ class RunDetails extends Page<RunDetailsProps, RunDetailsState> {
                                 }}>
                                   <Button
                                     onClick={() => {
-                                      Apis.generateVisualization()
+                                      const inputPath = prompt('inputPath');
+                                      if (!inputPath) {
+                                        return;
+                                      }
+                                      const args = prompt('arguments');
+                                      if (!args) {
+                                        return;
+                                      }
+                                      Apis.generateVisualization(0, inputPath, args.split('\n'))
                                         .then((response: string) => {
-                                            let json = JSON.parse(response);
+                                            const json = JSON.parse(response);
                                             if (selectedNodeDetails && json.html) {
                                               if (!selectedNodeDetails.viewerConfigs) {
                                                 selectedNodeDetails.viewerConfigs = [];

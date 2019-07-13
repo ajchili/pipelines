@@ -23,13 +23,15 @@ ENV PATH $PATH:/usr/local/gcloud/google-cloud-sdk/bin
 RUN pip3 install google-api-python-client \
                 pandas \
                 scikit-learn \
-                tensorflow \
+                tensorflow==1.13.1 \
+                tensorflow-model-analysis=0.13.1 \
                 jupyter_client \
                 ipykernel \
                 nbconvert \
                 nbformat \
                 bokeh \
-                minio
+                minio \
+                gcsfs
 
 WORKDIR /src
 

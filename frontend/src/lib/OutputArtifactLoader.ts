@@ -69,7 +69,7 @@ export class OutputArtifactLoader {
       plotMetadataList.map(async metadata => {
         switch (metadata.type) {
           case (PlotType.CONFUSION_MATRIX):
-            return await this.buildConfusionMatrixConfig(metadata);
+            return await this.buildPythonVisualizationConfig(metadata, 'confusion_matrix');
           case (PlotType.MARKDOWN):
             return await this.buildMarkdownViewerConfig(metadata);
           case (PlotType.TABLE):
@@ -79,7 +79,7 @@ export class OutputArtifactLoader {
           case (PlotType.WEB_APP):
             return await this.buildHtmlViewerConfig(metadata);
           case (PlotType.ROC):
-            return await this.buildRocCurveConfig(metadata);
+            return await this.buildPythonVisualizationConfig(metadata);
           default:
             logger.error('Unknown plot type: ' + metadata.type);
             return null;
@@ -249,5 +249,34 @@ export class OutputArtifactLoader {
       data: dataset,
       type: PlotType.ROC,
     };
+  }
+
+  public static async buildPythonVisualizationConfig(metadata: PlotMetadata, type: string = 'roc'): Promise<HTMLViewerConfig | ROCCurveConfig | ConfusionMatrixConfig> {
+    if (!metadata.source) {
+      throw new Error('Malformed metadata, property "source" is required.');
+    }
+    if (!metadata.schema) {
+      throw new Error('Malformed metadata, property "schema" is required.');
+    }
+    if (!Array.isArray(metadata.schema)) {
+      throw new Error('Malformed schema, must be an array of {"name": string, "type": string}');
+    }
+
+    const response = await Apis.generateVisualization(0, metadata.source, ['--is_generated', ` --type ${type}`]);
+    const json = JSON.parse(response);
+
+    if (json.html) {
+      return {
+        htmlContent: json.html,
+        type: PlotType.WEB_APP
+      };
+    } else {
+      switch (type) {
+        case 'confusion_matrix':
+          return await this.buildConfusionMatrixConfig(metadata);
+        default:
+          return await this.buildRocCurveConfig(metadata);
+      }
+    }
   }
 }

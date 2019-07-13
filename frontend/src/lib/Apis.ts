@@ -154,14 +154,12 @@ export class Apis {
     return this._fetch('system/project-id');
   }
 
-  public static async generateVisualization(): Promise<string> {
+  public static async generateVisualization(type: number, inputPath: string, args: string[]): Promise<string> {
     return this._fetch('/visualizations', v1beta1Prefix, '', {
       body: JSON.stringify({
-        'arguments': [
-          '--target_lambda "lambda x: (x[\'target\'] > x[\'fare\'] * 0.2)"'
-        ],
-        'inputPath': 'gs://kirinpatel/tfx-taxi-cab-classification-pipeline-example-s8726/predict/prediction_results-*',
-        'type': 0,
+        arguments: args,
+        inputPath,
+        type,
       }),
       cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
       headers: {

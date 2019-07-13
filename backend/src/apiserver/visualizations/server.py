@@ -25,6 +25,11 @@ parser.add_argument('--target_lambda', type=str,
                          'x[\'a\'] and x[\'b\']".')
 parser.add_argument('--true_score_column', type=str, default='true',
                     help='The name of the column for positive probability.')
+parser.add_argument('--is_generated', dest='is_generated', action='store_true',
+                    help='')
+parser.add_argument('--slicing_column', type=str,
+                    help='')
+parser.set_defaults(is_generated=False)
 
 
 class VisualizationHandler(tornado.web.RequestHandler):
@@ -36,6 +41,7 @@ class VisualizationHandler(tornado.web.RequestHandler):
             self.get_body_argument("arguments")))
         nb = new_notebook()
         nb.cells.append(exporter.create_cell_from_args(args))
+        print("generating visualization of type {}".format(args.type))
         nb.cells.append(exporter.create_cell_from_file(
             os.path.join(dirname, '{}.py'.format(args.type))))
         html = exporter.generate_html_from_notebook(nb)
