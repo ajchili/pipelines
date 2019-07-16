@@ -185,6 +185,8 @@ class RunDetails extends Page<RunDetailsProps, RunDetailsState> {
     const nodeInputOutputParams = WorkflowParser.getNodeInputOutputParams(workflow, selectedNodeId);
     const hasMetrics = runMetadata && runMetadata.metrics && runMetadata.metrics.length > 0;
 
+    const shouldAllowVisualizationGeneration = nodeInputOutputParams && nodeInputOutputParams[1] && !!nodeInputOutputParams[1].length;
+
     return (
       <div className={classes(commonCss.page, padding(20, 't'))}>
 
@@ -226,7 +228,7 @@ class RunDetails extends Page<RunDetailsProps, RunDetailsState> {
                                   </div>
                                 );
                               })}
-                              {(nodeInputOutputParams && nodeInputOutputParams[1] && nodeInputOutputParams[1].length) && (
+                              {shouldAllowVisualizationGeneration && (
                                 <div style={{
                                   marginLeft: 16,
                                   marginTop: 16,
