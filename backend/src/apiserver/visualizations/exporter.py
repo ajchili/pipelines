@@ -18,7 +18,6 @@ from nbconvert.preprocessors import ExecutePreprocessor
 from nbformat.v4 import new_code_cell, new_notebook
 from jupyter_client import KernelManager
 
-
 # Create custom KernelManager
 # This will circumvent issues where kernel is shutdown after preprocessing. Due
 # to the shutdown, latency is introduced because a kernel must be started per
@@ -38,10 +37,10 @@ def create_cell_from_args(args):
     variables = ""
     args = vars(args)
     for key in args:
-        if args[key] is not None:
-            variables += "{} = \"{}\"\n".format(key, args[key])
-        else:
+        if isinstance(args[key], (type(None), bool)):
             variables += "{} = {}\n".format(key, args[key])
+        else:
+            variables += "{} = \"{}\"\n".format(key, args[key])
 
     return new_code_cell(variables)
 

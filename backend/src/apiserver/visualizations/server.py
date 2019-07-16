@@ -26,10 +26,9 @@ parser.add_argument('--target_lambda', type=str,
 parser.add_argument('--true_score_column', type=str, default='true',
                     help='The name of the column for positive probability.')
 parser.add_argument('--is_generated', dest='is_generated', action='store_true',
-                    help='')
+                    default=False, help='')
 parser.add_argument('--slicing_column', type=str,
                     help='')
-parser.set_defaults(is_generated=False)
 
 
 class VisualizationHandler(tornado.web.RequestHandler):
