@@ -25,6 +25,7 @@ RUN pip3 install google-api-python-client \
                 scikit-learn \
                 tensorflow==1.13.1 \
                 tensorflow-model-analysis==0.13.1 \
+                tensorflow-data-validation \
                 jupyter_client \
                 ipykernel \
                 nbconvert \

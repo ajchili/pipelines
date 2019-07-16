@@ -70,7 +70,7 @@ def generate_html_from_notebook(nb):
 
     # Export all html and outputs
     (body, _) = html_exporter.from_notebook_node(nb)
-    return body
+    return body.replace('contentWindow.document.write', 'srcdoc=')
 
 
 def shutdown_kernel():
