@@ -78,11 +78,8 @@
           "description": "Path pattern of input data to be used during generation of visualizations.\nThis is required when creating the pipeline through CreateVisualization\nAPI."
         },
         "arguments": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "Command line arguments to be used during generation of visualizations.\nThis is required when creating the pipeline through CreateVisualization\nAPI."
+          "type": "string",
+          "description": "Variables to be used during generation of a visualization.\nThis should be provided as a JSON string.\nThis is required when creating the pipeline through CreateVisualization\nAPI."
         },
         "html": {
           "type": "string",
