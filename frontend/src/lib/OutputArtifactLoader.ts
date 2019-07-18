@@ -262,7 +262,10 @@ export class OutputArtifactLoader {
       throw new Error('Malformed schema, must be an array of {"name": string, "type": string}');
     }
 
-    const response = await Apis.generateVisualization(0, metadata.source, ['--is_generated', ` --type ${type}`]);
+    const response = await Apis.generateVisualization(0, metadata.source, JSON.stringify({
+      is_generated: 'True',
+      type
+    }));
     const json = JSON.parse(response);
 
     if (json.html) {

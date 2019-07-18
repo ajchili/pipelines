@@ -154,7 +154,7 @@ export class Apis {
     return this._fetch('system/project-id');
   }
 
-  public static async generateVisualization(type: number, inputPath: string, args: string[]): Promise<string> {
+  public static async generateVisualization(type: number, inputPath: string, args: string): Promise<string> {
     return this._fetch('/visualizations', v1beta1Prefix, '', {
       body: JSON.stringify({
         arguments: args,

@@ -236,11 +236,11 @@ class RunDetails extends Page<RunDetailsProps, RunDetailsState> {
                                       if (!inputPath) {
                                         return;
                                       }
-                                      const args = prompt('arguments');
+                                      const args = prompt('arguments as JSON');
                                       if (!args) {
                                         return;
                                       }
-                                      Apis.generateVisualization(0, inputPath, args.split('\n'))
+                                      Apis.generateVisualization(0, inputPath, args)
                                         .then((response: string) => {
                                             const json = JSON.parse(response);
                                             if (selectedNodeDetails && json.html) {
