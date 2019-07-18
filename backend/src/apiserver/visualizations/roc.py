@@ -37,13 +37,13 @@ import gcsfs
 
 # Load data
 if is_generated is False:
-    schema_file = os.path.join(os.path.dirname(predictions),
+    schema_file = os.path.join(os.path.dirname(input_path),
                                'schema.json')
     schema = json.loads(file_io.read_file_to_string(schema_file))
     names = [x['name'] for x in schema]
 
     dfs = []
-    files = file_io.get_matching_files(predictions)
+    files = file_io.get_matching_files(input_path)
     for file in files:
         with file_io.FileIO(file, 'r') as f:
             dfs.append(pd.read_csv(f, names=names))
@@ -56,7 +56,7 @@ if is_generated is False:
     fpr, tpr, thresholds = roc_curve(df['target'], df[true_score_column])
     source = pd.DataFrame({'fpr': fpr, 'tpr': tpr, 'thresholds': thresholds})
 else:
-    source = pd.read_csv(predictions, header=None, names=['fpr', 'tpr',
+    source = pd.read_csv(input_path, header=None, names=['fpr', 'tpr',
                                                           'thresholds'])
 
 # Create visualization

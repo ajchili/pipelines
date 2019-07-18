@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
 import os
 from nbconvert import HTMLExporter
 from nbconvert.preprocessors import ExecutePreprocessor
@@ -35,13 +36,14 @@ ep.preprocess(new_notebook(), {'metadata': {'path': os.getcwd()}}, km)
 # Returns the generated Notebook cell
 def create_cell_from_args(args):
     variables = ""
-    args = vars(args)
+    args = json.loads(args)
     for key in args:
         if isinstance(args[key], (type(None), bool)):
             variables += "{} = {}\n".format(key, args[key])
         else:
             variables += "{} = \"{}\"\n".format(key, args[key])
 
+    print(variables)
     return new_code_cell(variables)
 
 

@@ -13,22 +13,9 @@ dirname = os.path.dirname(__file__)
 parser = argparse.ArgumentParser(description='Visualization Generator')
 parser.add_argument('--type', type=str, default='roc',
                     help='Type of visualization to be generated.')
-parser.add_argument('--trueclass', type=str, default='true',
-                    help='The name of the class as true value. If' +
-                         'missing, assuming it is binary classification ' +
-                         'and default to "true".')
-parser.add_argument('--predictions', type=str,
-                    help='GCS path of prediction file pattern.')
-parser.add_argument('--target_lambda', type=str,
-                    help='a lambda function as a string to determine ' +
-                         'positive or negative. For example, "lambda x: ' +
-                         'x[\'a\'] and x[\'b\']".')
-parser.add_argument('--true_score_column', type=str, default='true',
-                    help='The name of the column for positive probability.')
-parser.add_argument('--is_generated', dest='is_generated', action='store_true',
-                    default=False, help='')
-parser.add_argument('--slicing_column', type=str,
-                    help='')
+parser.add_argument('--arguments', type=str, default='{}',
+                    help='JSON string of arguments to be provided to ' +
+                         'visualizations.')
 
 
 class VisualizationHandler(tornado.web.RequestHandler):
@@ -39,7 +26,7 @@ class VisualizationHandler(tornado.web.RequestHandler):
         args = parser.parse_args(shlex.split(
             self.get_body_argument("arguments")))
         nb = new_notebook()
-        nb.cells.append(exporter.create_cell_from_args(args))
+        nb.cells.append(exporter.create_cell_from_args(args.arguments))
         print("generating visualization of type {}".format(args.type))
         nb.cells.append(exporter.create_cell_from_file(
             os.path.join(dirname, '{}.py'.format(args.type))))

@@ -20,7 +20,7 @@ import pandas as pd
 from sklearn.metrics import confusion_matrix
 from bokeh.layouts import row
 from bokeh.plotting import figure
-from bokeh.io import output_notebook, show
+from bokeh.io import show
 from bokeh.models import HoverTool
 import gcsfs
 
@@ -51,20 +51,4 @@ else:
     source = pd.read_csv(predictions, header=None, names=['target', 'predicted',
                                                           'count'])
 
-output_notebook()
-
-factors = ["True", "False"].reverse()
-colors = [
-    "#0B486B", "#79BD9A",
-    "#79BD9A", "#0B486B",
-]
-
-hm = figure(tools="pan,wheel_zoom,box_zoom,reset,hover,previewsave",
-            x_range=factors, y_range=factors)
-hm.rect(["True", "False", "True", "False"], ["True", "False", "True", "False"],
-        color=colors, width=1, height=1)
-
-hover = hm.select(dict(type=HoverTool))
-hover.tooltips = [("Count", "@count")]
-
-show(row(hm, sizing_mode="scale_width"))
+print(source)
