@@ -13,9 +13,13 @@ gazelle(name = "gazelle")
 
 go_library(
     name = "go_default_library",
-    srcs = ["local-testing.go"],
+    srcs = [
+        "local-testing.go",
+        "server-testing.go",
+    ],
     importpath = "github.com/kubeflow/pipelines",
     visibility = ["//visibility:private"],
+    deps = ["//bazel-ajchili-pipelines/external/go_sdk/src/io/ioutil:go_default_library"],
 )
 
 go_binary(
