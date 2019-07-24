@@ -98,7 +98,7 @@ export interface ApiStatus {
     code?: number;
     /**
      * 
-     * @type {Array<ProtobufAny>}
+     * @type {Array&lt;ProtobufAny&gt;}
      * @memberof ApiStatus
      */
     details?: Array<ProtobufAny>;
@@ -278,7 +278,7 @@ export const VisualizationServiceApiFactory = function (configuration?: Configur
 export class VisualizationServiceApi extends BaseAPI {
     /**
      * 
-     * @param {ApiVisualization} body 
+     * @param {} body 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof VisualizationServiceApi
