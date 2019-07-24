@@ -14,13 +14,27 @@
 
 package storage
 
-import "path"
+import (
+	"github.com/kubeflow/pipelines/backend/api/go_client"
+	"path"
+	"strings"
+)
 
 const (
 	pipelineFolder = "pipelines"
+	visualizationFolder = "visualizations"
 )
 
 // CreatePipelinePath creates object store path to a pipeline spec.
 func CreatePipelinePath(pipelineID string) string {
 	return path.Join(pipelineFolder, pipelineID)
+}
+
+// CreateVisualizationPath creates object store path to visualization spec.
+func CreateVisualizationPath(visualization *go_client.Visualization) string {
+	visualizationType := strings.ToLower(go_client.Visualization_Type_name[int32(visualization.Type)])
+	cleanInputPath := path.Clean(visualization.InputPath)
+	cleanInputPath = strings.ToLower(cleanInputPath)
+	cleanInputPath = strings.Replace(cleanInputPath, "/", "_", -1)
+	return path.Join(visualizationFolder, visualizationType, cleanInputPath)
 }

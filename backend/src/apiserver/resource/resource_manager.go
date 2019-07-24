@@ -626,3 +626,11 @@ func (r *ResourceManager) HaveSamplesLoaded() (bool, error) {
 func (r *ResourceManager) MarkSampleLoaded() error {
 	return r.dBStatusStore.MarkSampleLoaded()
 }
+
+func (r *ResourceManager) GetVisualizationFromArtifactStore(visualization *api.Visualization) ([]byte, error) {
+	return r.objectStore.GetFile(storage.CreateVisualizationPath(visualization))
+}
+
+func (r *ResourceManager) PutVisualizationInArtifactStore(artifactData []byte, visualization *api.Visualization) error {
+	return r.objectStore.AddFile(artifactData, storage.CreateVisualizationPath(visualization))
+}

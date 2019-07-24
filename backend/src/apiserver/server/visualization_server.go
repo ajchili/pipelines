@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
 )
 
 type VisualizationServer struct {
@@ -22,11 +23,32 @@ func (s *VisualizationServer) CreateVisualization(ctx context.Context, request *
 	if err := s.validateCreateVisualizationRequest(request); err != nil {
 		return nil, err
 	}
-	body, err := s.GenerateVisualizationFromRequest(request)
-	if err != nil {
-		return nil, err
+	// TODO: Add run id to visualization cache key
+	// Ignore error and only check for data when obtaining artifact from MinIO.
+	data, _ := s.GetArtifactFromMinio(request.Visualization)
+	// Check if data exists and the length of data is greater than 0. This is done
+	// because MinIO does not return an error if an object does not exist. Instead
+	// it returns and empty byte array. It can then be assumed that if an empty
+	// byte array is received, the visualization does not exist. This can be
+	// assumed because a visualization, regardless of if an output is generated,
+	// will always have the template html (roughly 13k loc) when exported by
+	// nbcovert.
+	if data != nil && len(data) > 0 {
+		request.Visualization.Html = string(data)
+	} else {
+		start := time.Now()
+		body, err := s.GenerateVisualizationFromRequest(request)
+		if err != nil {
+			return nil, err
+		}
+		request.Visualization.Html = string(body)
+		t := time.Now()
+		elapsed := t.Sub(start)
+		// Only cache visualization if it takes longer than two seconds to generate.
+		if elapsed > time.Second * 2 {
+			defer s.PutArtifactInMinio(body, request.Visualization)
+		}
 	}
-	request.Visualization.Html = string(body)
 	return request.Visualization, nil
 }
 
@@ -104,6 +126,14 @@ func (s *VisualizationServer) GenerateVisualizationFromRequest(request *go_clien
 		return nil, util.Wrap(err, "Unable to parse visualization response.")
 	}
 	return body, nil
+}
+
+func (s *VisualizationServer) GetArtifactFromMinio(visualization *go_client.Visualization) ([]byte, error) {
+	return s.resourceManager.GetVisualizationFromArtifactStore(visualization)
+}
+
+func (s *VisualizationServer) PutArtifactInMinio(artifactData []byte, visualization *go_client.Visualization) error {
+	return s.resourceManager.PutVisualizationInArtifactStore(artifactData, visualization)
 }
 
 func NewVisualizationServer(resourceManager *resource.ResourceManager) *VisualizationServer {
