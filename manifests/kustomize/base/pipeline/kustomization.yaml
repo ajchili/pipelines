@@ -24,6 +24,11 @@ resources:
 - ml-pipeline-viewer-crd-rolebinding.yaml
 - ml-pipeline-viewer-crd-deployment.yaml
 - ml-pipeline-viewer-crd-sa.yaml
+- ml-pipeline-visualizationserver-deployment.yaml
+- ml-pipeline-visualizationserver-role.yaml
+- ml-pipeline-visualizationserver-rolebinding.yaml
+- ml-pipeline-visualizationserver-sa.yaml
+- ml-pipeline-visualizationserver-service.yaml
 - pipeline-runner-role.yaml
 - pipeline-runner-rolebinding.yaml
 - pipeline-runner-sa.yaml

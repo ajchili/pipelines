@@ -28,3 +28,6 @@ images:
   newTag: 0.1.25
 - name: gcr.io/ml-pipeline/inverse-proxy-agent
   newTag: 0.1.25
+- name: gcr.io/ml-pipeline/visualization-server
+  # TODO: Push image to GCR and obtain tag
+  newTag: 0.0.0
