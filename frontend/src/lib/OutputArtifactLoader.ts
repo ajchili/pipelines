@@ -25,6 +25,7 @@ import { ROCCurveConfig } from '../components/viewers/ROCCurve';
 import { TensorboardViewerConfig } from '../components/viewers/Tensorboard';
 import { csvParseRows } from 'd3-dsv';
 import { logger, errorToMessage } from './Utils';
+import { ApiVisualizationType } from 'src/apis/visualization';
 
 export interface PlotMetadata {
   format?: 'csv';
@@ -73,13 +74,13 @@ export class OutputArtifactLoader {
           case (PlotType.MARKDOWN):
             return await this.buildMarkdownViewerConfig(metadata);
           case (PlotType.TABLE):
-            return await this.buildPagedTableConfig(metadata);
+            return await this.buildPythonVisualizationConfig(metadata, ApiVisualizationType.TABLE);
           case (PlotType.TENSORBOARD):
             return await this.buildTensorboardConfig(metadata);
           case (PlotType.WEB_APP):
             return await this.buildHtmlViewerConfig(metadata);
           case (PlotType.ROC):
-            return await this.buildRocCurveConfig(metadata);
+            return await this.buildPythonVisualizationConfig(metadata, ApiVisualizationType.ROCCURVE);
           default:
             logger.error('Unknown plot type: ' + metadata.type);
             return null;
@@ -249,5 +250,55 @@ export class OutputArtifactLoader {
       data: dataset,
       type: PlotType.ROC,
     };
+  }
+
+  public static async buildPythonVisualizationConfig(metadata: PlotMetadata, type: ApiVisualizationType): Promise<ViewerConfig> {
+    if (!metadata.source) {
+      throw new Error('Malformed metadata, property "source" is required.');
+    }
+    try {
+      const visualization = await Apis.visualizationServiceApi.createVisualization({
+        arguments: this.getPythonArgumentsForVisualizationType(metadata, type),
+        source: metadata.source,
+        type,
+      });
+      if (visualization.html) {
+        return {
+          htmlContent: visualization.html,
+          type: PlotType.WEB_APP,
+        } as HTMLViewerConfig;
+      } else {
+        throw new Error('Unable to generate visualization!');
+      }
+    } catch (err) {
+      // Determine type and fall back to previous visualization method.
+      // If no type can be determined, default to html.
+      switch (type) {
+        case ApiVisualizationType.ROCCURVE:
+          return this.buildRocCurveConfig(metadata);
+        case ApiVisualizationType.TABLE:
+          return this.buildPagedTableConfig(metadata);
+        default:
+          return this.buildHtmlViewerConfig(metadata);
+      }
+    }
+  }
+
+  private static getPythonArgumentsForVisualizationType(metadata: PlotMetadata, type: ApiVisualizationType): string {
+    switch (type) {
+      case ApiVisualizationType.ROCCURVE:
+        return JSON.stringify({
+          'is_generated': 'True'
+        });
+      case ApiVisualizationType.TABLE:
+        if (!metadata.header) {
+          throw new Error('Malformed metadata, property "header" is required.');
+        }
+        return JSON.stringify({
+          headers: metadata.header
+        });
+      default:
+        return '{}';
+    }
   }
 }

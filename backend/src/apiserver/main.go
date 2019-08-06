@@ -129,7 +129,15 @@ func startHttpProxy(resourceManager *resource.ResourceManager) {
 
 func registerHttpHandlerFromEndpoint(handler RegisterHttpHandlerFromEndpoint, serviceName string, ctx context.Context, mux *runtime.ServeMux) {
 	endpoint := "localhost" + *rpcPortFlag
-	opts := []grpc.DialOption{grpc.WithInsecure()}
+	var maxCallRecvMsgSize = 4
+	if serviceName == "Visualization" {
+		// Allow the Visualization service to receive messages of up to 50mb in size
+		maxCallRecvMsgSize = 50
+	}
+	opts := []grpc.DialOption{
+		grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(maxCallRecvMsgSize * 1024 * 1024)),
+		grpc.WithInsecure(),
+	}
 
 	if err := handler(ctx, mux, endpoint, opts); err != nil {
 		glog.Fatalf("Failed to register %v handler: %v", serviceName, err)

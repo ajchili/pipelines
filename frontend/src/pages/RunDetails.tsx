@@ -39,7 +39,7 @@ import { OutputArtifactLoader } from '../lib/OutputArtifactLoader';
 import { Page } from './Page';
 import { RoutePage, RouteParams } from '../components/Router';
 import { ToolbarProps } from '../components/Toolbar';
-import { ViewerConfig } from '../components/viewers/Viewer';
+import { ViewerConfig, PlotType } from '../components/viewers/Viewer';
 import { Workflow } from '../../third_party/argo-ui/argo_template';
 import { classes, stylesheet } from 'typestyle';
 import { commonCss, padding, color, fonts, fontsize } from '../Css';
@@ -47,6 +47,9 @@ import { componentMap } from '../components/viewers/ViewerContainer';
 import { flatten } from 'lodash';
 import { formatDateString, getRunDurationFromWorkflow, logger, errorToMessage } from '../lib/Utils';
 import { statusToIcon } from './Status';
+import VisualizationCreator, { VisualizationCreatorConfig } from 'src/components/viewers/VisualizationCreator';
+import { ApiVisualization, ApiVisualizationType } from 'src/apis/visualization';
+import { HTMLViewerConfig } from 'src/components/viewers/HTMLViewer';
 
 enum SidePaneTab {
   ARTIFACTS,
@@ -75,6 +78,7 @@ interface AnnotatedConfig {
 interface RunDetailsState {
   allArtifactConfigs: AnnotatedConfig[];
   experiment?: ApiExperiment;
+  isGeneratingVisualization: boolean;
   legacyStackdriverUrl: string;
   logsBannerAdditionalInfo: string;
   logsBannerMessage: string;
@@ -135,6 +139,7 @@ class RunDetails extends Page<RunDetailsProps, RunDetailsState> {
 
     this.state = {
       allArtifactConfigs: [],
+      isGeneratingVisualization: false,
       legacyStackdriverUrl: '',
       logsBannerAdditionalInfo: '',
       logsBannerMessage: '',
@@ -215,6 +220,48 @@ class RunDetails extends Page<RunDetailsProps, RunDetailsState> {
                         <div className={commonCss.page}>
                           {sidepanelSelectedTab === SidePaneTab.ARTIFACTS && (
                             <div className={commonCss.page}>
+                              <div className={padding(20, 'lrt')}>
+                                <PlotCard configs={[{
+                                  isBusy: this.state.isGeneratingVisualization,
+                                  onGenerate: (visualizationArguments: string, source: string, type: ApiVisualizationType) => {
+                                    try {
+                                      JSON.parse(visualizationArguments);
+                                    } catch (err) {
+                                      // TODO: Handle error
+                                      return;
+                                    }
+                                    this.setState({ isGeneratingVisualization: true });
+                                    const visualization: ApiVisualization = {
+                                      arguments: visualizationArguments,
+                                      source,
+                                      type,
+                                    };
+                                    Apis.visualizationServiceApi.createVisualization(visualization)
+                                      .then((_visualization: ApiVisualization) => {
+                                        if (_visualization.html) {
+                                          const config: HTMLViewerConfig = {
+                                            htmlContent: _visualization.html,
+                                            type: PlotType.WEB_APP,
+                                          };
+                                          if (!selectedNodeDetails.viewerConfigs) {
+                                            selectedNodeDetails.viewerConfigs = [];
+                                          }
+                                          selectedNodeDetails.viewerConfigs.push(config);
+                                          this.setState({ selectedNodeDetails });
+                                        }
+                                      })
+                                      // tslint:disable-next-line:no-console
+                                      .catch(console.error)
+                                      .then(() => {
+                                        this.setState({ isGeneratingVisualization: false });
+                                      });
+                                  },
+                                  type: PlotType.VISUALIZATION_CREATOR,
+                                } as VisualizationCreatorConfig]}
+                                  title={VisualizationCreator.prototype.getDisplayName()}
+                                  maxDimension={500} />
+                                <Hr />
+                              </div>
                               {(selectedNodeDetails.viewerConfigs || []).map((config, i) => {
                                 const title = componentMap[config.type].prototype.getDisplayName();
                                 return (

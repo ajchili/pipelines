@@ -132,12 +132,12 @@ class VisualizationCreator extends Viewer<VisualizationCreatorProps, Visualizati
         placeholder='File path or path pattern of data within GCS.'
         onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.setState({ source: e.target.value })} />
       <Input label='Arguments (optional)' multiline={true} variant='outlined'
-        value={_arguments} disabled={isBusy}
+        value={_arguments} disabled={isBusy} placeholder={'{\n\n}'}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.setState({ arguments: e.target.value })} />
       <BusyButton title='Generate Visualization' busy={isBusy} disabled={!canGenerate}
         onClick={() => {
           if (onGenerate && selectedType) {
-            onGenerate(_arguments, source, selectedType);
+            onGenerate(_arguments || '{}', source, selectedType);
           }
         }} />
     </div>;
