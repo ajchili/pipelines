@@ -35,7 +35,7 @@ func (s *VisualizationServer) CreateVisualization(ctx context.Context, request *
 // It returns an error if a go_client.Visualization object does not have valid
 // values.
 func (s *VisualizationServer) validateCreateVisualizationRequest(request *go_client.CreateVisualizationRequest) error {
-	if len(request.Visualization.Source) == 0 {
+	if request.Visualization.Type != go_client.Visualization_CUSTOM && len(request.Visualization.Source) == 0 {
 		return util.NewInvalidInputError("A visualization requires a Source to be provided. Received %s", request.Visualization.Source)
 	}
 	// Manually set Arguments to empty JSON if nothing is provided. This is done

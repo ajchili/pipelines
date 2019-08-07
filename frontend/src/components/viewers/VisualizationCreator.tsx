@@ -40,6 +40,7 @@ interface VisualizationCreatorProps {
 interface VisualizationCreatorState {
   // arguments is expected to be a JSON object in string form.
   arguments: string;
+  code: string;
   source: string;
   selectedType?: ApiVisualizationType;
 }
@@ -70,6 +71,7 @@ class VisualizationCreator extends Viewer<VisualizationCreatorProps, Visualizati
     super(props);
     this.state = {
       arguments: '',
+      code: '',
       source: '',
     };
   }
@@ -81,7 +83,7 @@ class VisualizationCreator extends Viewer<VisualizationCreatorProps, Visualizati
   public render(): JSX.Element | null {
     const { configs } = this.props;
     const config = configs[0];
-    const { arguments: _arguments, source, selectedType } = this.state;
+    const { arguments: _arguments, code, source, selectedType } = this.state;
 
     if (!config) {
       return null;
@@ -94,8 +96,10 @@ class VisualizationCreator extends Viewer<VisualizationCreatorProps, Visualizati
     // provided, and a visualization type is selected, and a onGenerate function
     // is provided.
     const canGenerate = !isBusy &&
-      !!source.length &&
-      !!selectedType &&
+      (
+        (!!source.length && !!selectedType) ||
+        (selectedType === ApiVisualizationType.CUSTOM && !!code.length)
+      ) &&
       !!onGenerate;
 
     return <div
@@ -128,16 +132,31 @@ class VisualizationCreator extends Viewer<VisualizationCreatorProps, Visualizati
         </Select>
       </FormControl>
 
-      <Input label='Source' variant={'outlined'} value={source} disabled={isBusy}
+      <Input label='Source' variant={'outlined'} value={source}
+        disabled={isBusy}
         placeholder='File path or path pattern of data within GCS.'
         onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.setState({ source: e.target.value })} />
       <Input label='Arguments (optional)' multiline={true} variant='outlined'
         value={_arguments} disabled={isBusy} placeholder={'{\n\n}'}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.setState({ arguments: e.target.value })} />
+      {selectedType === ApiVisualizationType.CUSTOM &&
+        <Input label='Custom Visualization Code' multiline={true}
+          variant='outlined' value={code} disabled={isBusy}
+          placeholder={'{\n\n}'}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.setState({ code: e.target.value })} />
+      }
       <BusyButton title='Generate Visualization' busy={isBusy} disabled={!canGenerate}
         onClick={() => {
           if (onGenerate && selectedType) {
-            onGenerate(_arguments || '{}', source, selectedType);
+            const specifiedArguments: any = JSON.parse(_arguments || '{}');
+            if (selectedType === ApiVisualizationType.CUSTOM) {
+              specifiedArguments.code = code.split('\n');
+            }
+            onGenerate(
+              JSON.stringify(specifiedArguments),
+              source,
+              selectedType
+            );
           }
         }} />
     </div>;

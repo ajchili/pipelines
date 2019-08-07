@@ -102,6 +102,13 @@ class Exporter:
         return new_code_cell("variables = {}".format(repr(variables)))
 
     @staticmethod
+    def create_cell_from_arbitrary_code(variables: dict) -> NotebookNode:
+        if variables["code"] is not None:
+            return new_code_cell("\n".join(variables["code"]))
+
+        return new_code_cell()
+
+    @staticmethod
     def create_cell_from_file(filepath: Text) -> NotebookNode:
         """Creates a NotebookNode object with provided file as code in node.
 

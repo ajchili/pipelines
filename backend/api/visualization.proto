@@ -79,6 +79,7 @@ message Visualization {
     ROC_CURVE = 0;
     TFDV = 1;
     TABLE = 2;
+    CUSTOM = 3;
   };
   Type type = 1;
 

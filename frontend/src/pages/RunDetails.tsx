@@ -233,7 +233,7 @@ class RunDetails extends Page<RunDetailsProps, RunDetailsState> {
                                     this.setState({ isGeneratingVisualization: true });
                                     const visualization: ApiVisualization = {
                                       arguments: visualizationArguments,
-                                      source,
+                                      source: type === ApiVisualizationType.CUSTOM ? 'gs://kirinpatel/data.csv' : source,
                                       type,
                                     };
                                     Apis.visualizationServiceApi.createVisualization(visualization)
