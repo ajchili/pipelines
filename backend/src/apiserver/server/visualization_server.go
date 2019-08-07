@@ -57,7 +57,12 @@ func (s *VisualizationServer) validateCreateVisualizationRequest(request *go_cli
 // It returns the generated HTML as a string and any error that is encountered.
 func (s *VisualizationServer) generateVisualizationFromRequest(request *go_client.CreateVisualizationRequest) ([]byte, error) {
 	visualizationType := strings.ToLower(go_client.Visualization_Type_name[int32(request.Visualization.Type)])
-	arguments := fmt.Sprintf("--type %s --source %s --arguments '%s'", visualizationType, request.Visualization.Source, request.Visualization.Arguments)
+	var arguments string
+	if request.Visualization.Type == go_client.Visualization_CUSTOM && len(request.Visualization.Source) == 0 {
+		arguments = fmt.Sprintf("--type %s --arguments '%s'", visualizationType, request.Visualization.Arguments)
+	} else {
+		arguments = fmt.Sprintf("--type %s --source %s --arguments '%s'", visualizationType, request.Visualization.Source, request.Visualization.Arguments)
+	}
 	resp, err := http.PostForm(s.serviceURL, url.Values{"arguments": {arguments}})
 	if err != nil {
 		return nil, util.Wrap(err, "Unable to initialize visualization request.")
