@@ -15,6 +15,8 @@
  */
 
 import * as React from 'react';
+import AceEditor from 'react-ace';
+import 'brace';
 import BusyButton from '../../atoms/BusyButton';
 import FormControl from '@material-ui/core/FormControl';
 import Input from '../../atoms/Input';
@@ -23,6 +25,10 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
 import Viewer, { ViewerConfig } from './Viewer';
 import { ApiVisualizationType } from '../../apis/visualization';
+import 'brace/mode/json';
+import 'brace/mode/python';
+import 'brace/theme/github';
+import { Tooltip } from '@material-ui/core';
 
 
 export interface VisualizationCreatorConfig extends ViewerConfig {
@@ -107,7 +113,9 @@ class VisualizationCreator extends Viewer<VisualizationCreatorProps, Visualizati
         width: this.props.maxWidth || 600
       }}>
       <FormControl style={{ width: '100%' }}>
-        <InputLabel htmlFor='visualization-type-selector'>Type</InputLabel>
+        <InputLabel htmlFor='visualization-type-selector' required={true}>
+          Type
+        </InputLabel>
         <Select
           value={selectedType}
           inputProps={{
@@ -135,15 +143,33 @@ class VisualizationCreator extends Viewer<VisualizationCreatorProps, Visualizati
       <Input label='Source' variant={'outlined'} value={source}
         disabled={isBusy}
         placeholder='File path or path pattern of data within GCS.'
+        required={selectedType !== ApiVisualizationType.CUSTOM}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.setState({ source: e.target.value })} />
-      <Input label='Arguments (optional)' multiline={true} variant='outlined'
-        value={_arguments} disabled={isBusy} placeholder={'{\n\n}'}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.setState({ arguments: e.target.value })} />
+      <InputLabel>Arguments (Optional)</InputLabel>
+      <AceEditor
+        placeholder='Arguments, provided as JSON, to be used during visualization generation.'
+        width='100%' height='100px' mode='json' theme='github'
+        value={_arguments}
+        onChange={(value: string) => this.setState({ arguments: value })}
+        editorProps={{ $blockScrolling: true }}
+        highlightActiveLine={true} showGutter={true}
+      />
       {selectedType === ApiVisualizationType.CUSTOM &&
-        <Input label='Custom Visualization Code' multiline={true}
-          variant='outlined' value={code} disabled={isBusy}
-          placeholder={'{\n\n}'}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.setState({ code: e.target.value })} />
+        <div>
+          <Tooltip title='To access the source value (if provided), reference the variable "source". To access any provided arguments, reference the variable "variables" (it is a dict object).'>
+            <InputLabel>
+              Custom Visualization Code (hover for details)
+            </InputLabel>
+          </Tooltip>
+          <AceEditor
+            placeholder='Python code that will be run to generate visualization.'
+            width='100%' height='150px' mode='python' theme='github'
+            value={code}
+            onChange={(value: string) => this.setState({ code: value })}
+            editorProps={{ $blockScrolling: true }}
+            highlightActiveLine={true} showGutter={true}
+          />
+        </div>
       }
       <BusyButton title='Generate Visualization' busy={isBusy} disabled={!canGenerate}
         onClick={() => {
