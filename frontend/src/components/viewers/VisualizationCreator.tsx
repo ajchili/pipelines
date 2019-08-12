@@ -15,7 +15,6 @@
  */
 
 import * as React from 'react';
-import AceEditor from 'react-ace';
 import 'brace';
 import BusyButton from '../../atoms/BusyButton';
 import FormControl from '@material-ui/core/FormControl';
@@ -23,13 +22,13 @@ import Input from '../../atoms/Input';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
+import Editor from '../Editor';
 import Viewer, { ViewerConfig } from './Viewer';
 import { ApiVisualizationType } from '../../apis/visualization';
+import 'brace/ext/language_tools';
 import 'brace/mode/json';
 import 'brace/mode/python';
 import 'brace/theme/github';
-import { Tooltip } from '@material-ui/core';
-
 
 export interface VisualizationCreatorConfig extends ViewerConfig {
   // Whether there is currently a visualization being generated or not.
@@ -72,7 +71,7 @@ class VisualizationCreator extends Viewer<VisualizationCreatorProps, Visualizati
   private _types = Object.keys(ApiVisualizationType)
     .map((key: string) => key.replace('_', ''))
     .filter((key: string, i: number, arr: string[]) => arr.indexOf(key) === i);
-
+    
   constructor(props: VisualizationCreatorProps) {
     super(props);
     this.state = {
@@ -107,6 +106,9 @@ class VisualizationCreator extends Viewer<VisualizationCreatorProps, Visualizati
         (selectedType === ApiVisualizationType.CUSTOM && !!code.length)
       ) &&
       !!onGenerate;
+
+    const argumentsPlaceholder =
+      this.getArgumentPlaceholderForType(selectedType);
 
     return <div
       style={{
@@ -145,27 +147,30 @@ class VisualizationCreator extends Viewer<VisualizationCreatorProps, Visualizati
         placeholder='File path or path pattern of data within GCS.'
         required={selectedType !== ApiVisualizationType.CUSTOM}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.setState({ source: e.target.value })} />
-      <InputLabel>Arguments (Optional)</InputLabel>
-      <AceEditor
-        placeholder='Arguments, provided as JSON, to be used during visualization generation.'
-        width='100%' height='100px' mode='json' theme='github'
-        value={_arguments}
-        onChange={(value: string) => this.setState({ arguments: value })}
-        editorProps={{ $blockScrolling: true }}
-        highlightActiveLine={true} showGutter={true}
-      />
       {selectedType === ApiVisualizationType.CUSTOM &&
         <div>
-          <Tooltip title='To access the source value (if provided), reference the variable "source". To access any provided arguments, reference the variable "variables" (it is a dict object).'>
-            <InputLabel>
-              Custom Visualization Code (hover for details)
-            </InputLabel>
-          </Tooltip>
-          <AceEditor
-            placeholder='Python code that will be run to generate visualization.'
+          <InputLabel>Custom Visualization Code</InputLabel>
+          <Editor
+            placeholder='Python code that will be run to generate visualization.<br><br>To access the source value (if provided), reference the variable "source".<br>To access any provided arguments, reference the variable "variables" (it is a dict object).'
             width='100%' height='150px' mode='python' theme='github'
             value={code}
             onChange={(value: string) => this.setState({ code: value })}
+            editorProps={{ $blockScrolling: true }}
+            enableLiveAutocompletion={true}
+            enableBasicAutocompletion={true}
+            highlightActiveLine={true} showGutter={true}
+          />
+        </div>
+      }
+      {!!selectedType &&
+        <div>
+          <InputLabel>Arguments (Optional)</InputLabel>
+          <Editor
+            placeholder={argumentsPlaceholder}
+            height={`${argumentsPlaceholder.split('<br>').length * 14}px`}
+            width='100%' mode='json' theme='github'
+            value={_arguments}
+            onChange={(value: string) => this.setState({ arguments: value })}
             editorProps={{ $blockScrolling: true }}
             highlightActiveLine={true} showGutter={true}
           />
@@ -186,6 +191,38 @@ class VisualizationCreator extends Viewer<VisualizationCreatorProps, Visualizati
           }
         }} />
     </div>;
+  }
+    
+  private getArgumentPlaceholderForType(type: ApiVisualizationType | undefined): string {
+    let placeholder= 'Arguments, provided as JSON, to be used during visualization generation.';
+    switch(type) {
+      case ApiVisualizationType.ROCCURVE:
+        placeholder = `{
+        \t"y_true": array,
+        \t"y_score": array,
+        \t"pos_label": number | string | null,
+        \t"sample_weight": array | null,
+        \t"drop_intermediate": boolean | null,
+        \t"is_generated": boolean | null,
+        }`;
+        break;
+      case ApiVisualizationType.TFDV:
+        placeholder = '{}';
+        break;
+      case ApiVisualizationType.TABLE:
+        placeholder = '{\n\t"headers": array\n}';
+        break;
+      case ApiVisualizationType.CUSTOM:
+        placeholder = '{\n\t"key": any\n}';
+        break;
+    }
+    return placeholder
+      // Replaces newline escape character with HTML break so placeholder can
+      // support multiple lines.
+      .replace(new RegExp('\n', 'g'), '<br>')
+      // Replaces tab escape character with 4 blank spaces so placeholder can
+      // support indentation.
+      .replace(new RegExp('\t', 'g'), '&nbsp&nbsp&nbsp&nbsp');
   }
 }
 
