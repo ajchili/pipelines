@@ -63,15 +63,142 @@ exports[`VisualizationCreator disables all select and input fields when busy 1`]
       </WithStyles(MenuItem)>
     </WithStyles(WithFormControlContext(Select))>
   </WithStyles(FormControl)>
-  <Component
+  <WithStyles(Grid)
+    container={true}
+    spacing={8}
+  >
+    <WithStyles(Grid)
+      item={true}
+      xs={12}
+    >
+      <Component
+        disabled={true}
+        label="Source"
+        onChange={[Function]}
+        placeholder="File path or path pattern of data within GCS."
+        required={true}
+        value=""
+        variant="outlined"
+      />
+    </WithStyles(Grid)>
+  </WithStyles(Grid)>
+  <BusyButton
+    busy={true}
     disabled={true}
-    label="Source"
-    onChange={[Function]}
-    placeholder="File path or path pattern of data within GCS."
-    required={true}
-    value=""
-    variant="outlined"
+    onClick={[Function]}
+    title="Generate Visualization"
   />
+</div>
+`;
+
+exports[`VisualizationCreator disables all select and input fields when busy and outputSuggestions are provided 1`] = `
+<div
+  style={
+    Object {
+      "width": 600,
+    }
+  }
+>
+  <WithStyles(FormControl)
+    style={
+      Object {
+        "width": "100%",
+      }
+    }
+  >
+    <WithStyles(WithFormControlContext(InputLabel))
+      htmlFor="visualization-type-selector"
+      required={true}
+    >
+      Type
+    </WithStyles(WithFormControlContext(InputLabel))>
+    <WithStyles(WithFormControlContext(Select))
+      disabled={true}
+      inputProps={
+        Object {
+          "id": "visualization-type-selector",
+          "name": "Visualization Type",
+        }
+      }
+      onChange={[Function]}
+      style={
+        Object {
+          "minHeight": 60,
+          "width": "100%",
+        }
+      }
+    >
+      <WithStyles(MenuItem)
+        key="ROCCURVE"
+        value="ROC_CURVE"
+      >
+        ROC_CURVE
+      </WithStyles(MenuItem)>
+      <WithStyles(MenuItem)
+        key="TFDV"
+        value="TFDV"
+      >
+        TFDV
+      </WithStyles(MenuItem)>
+      <WithStyles(MenuItem)
+        key="TABLE"
+        value="TABLE"
+      >
+        TABLE
+      </WithStyles(MenuItem)>
+      <WithStyles(MenuItem)
+        key="CUSTOM"
+        value="CUSTOM"
+      >
+        CUSTOM
+      </WithStyles(MenuItem)>
+    </WithStyles(WithFormControlContext(Select))>
+  </WithStyles(FormControl)>
+  <WithStyles(Grid)
+    container={true}
+    spacing={8}
+  >
+    <WithStyles(Grid)
+      item={true}
+      xs={9}
+    >
+      <Component
+        disabled={true}
+        label="Source"
+        onChange={[Function]}
+        placeholder="File path or path pattern of data within GCS."
+        required={true}
+        value=""
+        variant="outlined"
+      />
+    </WithStyles(Grid)>
+    <WithStyles(Grid)
+      item={true}
+      xs={3}
+    >
+      <Component
+        disabled={true}
+        label="Outputs"
+        onChange={[Function]}
+        select={true}
+        value=""
+        variant="outlined"
+      >
+        <WithStyles(MenuItem)
+          key="0"
+          value="gs://ml-pipeline/table.csv"
+        >
+          gs://ml-pipeline/table.csv
+        </WithStyles(MenuItem)>
+        <WithStyles(MenuItem)
+          key="1"
+          value="gs://ml-pipeline/roc.csv"
+        >
+          gs://ml-pipeline/roc.csv
+        </WithStyles(MenuItem)>
+      </Component>
+    </WithStyles(Grid)>
+  </WithStyles(Grid)>
   <BusyButton
     busy={true}
     disabled={true}
@@ -82,6 +209,123 @@ exports[`VisualizationCreator disables all select and input fields when busy 1`]
 `;
 
 exports[`VisualizationCreator does not render component when no config is provided 1`] = `""`;
+
+exports[`VisualizationCreator renders an output select input field when outputSuggestions are specified 1`] = `
+<div
+  style={
+    Object {
+      "width": 600,
+    }
+  }
+>
+  <WithStyles(FormControl)
+    style={
+      Object {
+        "width": "100%",
+      }
+    }
+  >
+    <WithStyles(WithFormControlContext(InputLabel))
+      htmlFor="visualization-type-selector"
+      required={true}
+    >
+      Type
+    </WithStyles(WithFormControlContext(InputLabel))>
+    <WithStyles(WithFormControlContext(Select))
+      disabled={false}
+      inputProps={
+        Object {
+          "id": "visualization-type-selector",
+          "name": "Visualization Type",
+        }
+      }
+      onChange={[Function]}
+      style={
+        Object {
+          "minHeight": 60,
+          "width": "100%",
+        }
+      }
+    >
+      <WithStyles(MenuItem)
+        key="ROCCURVE"
+        value="ROC_CURVE"
+      >
+        ROC_CURVE
+      </WithStyles(MenuItem)>
+      <WithStyles(MenuItem)
+        key="TFDV"
+        value="TFDV"
+      >
+        TFDV
+      </WithStyles(MenuItem)>
+      <WithStyles(MenuItem)
+        key="TABLE"
+        value="TABLE"
+      >
+        TABLE
+      </WithStyles(MenuItem)>
+      <WithStyles(MenuItem)
+        key="CUSTOM"
+        value="CUSTOM"
+      >
+        CUSTOM
+      </WithStyles(MenuItem)>
+    </WithStyles(WithFormControlContext(Select))>
+  </WithStyles(FormControl)>
+  <WithStyles(Grid)
+    container={true}
+    spacing={8}
+  >
+    <WithStyles(Grid)
+      item={true}
+      xs={9}
+    >
+      <Component
+        disabled={false}
+        label="Source"
+        onChange={[Function]}
+        placeholder="File path or path pattern of data within GCS."
+        required={true}
+        value=""
+        variant="outlined"
+      />
+    </WithStyles(Grid)>
+    <WithStyles(Grid)
+      item={true}
+      xs={3}
+    >
+      <Component
+        disabled={false}
+        label="Outputs"
+        onChange={[Function]}
+        select={true}
+        value=""
+        variant="outlined"
+      >
+        <WithStyles(MenuItem)
+          key="0"
+          value="gs://ml-pipeline/table.csv"
+        >
+          gs://ml-pipeline/table.csv
+        </WithStyles(MenuItem)>
+        <WithStyles(MenuItem)
+          key="1"
+          value="gs://ml-pipeline/roc.csv"
+        >
+          gs://ml-pipeline/roc.csv
+        </WithStyles(MenuItem)>
+      </Component>
+    </WithStyles(Grid)>
+  </WithStyles(Grid)>
+  <BusyButton
+    busy={false}
+    disabled={true}
+    onClick={[Function]}
+    title="Generate Visualization"
+  />
+</div>
+`;
 
 exports[`VisualizationCreator renders component when all parameters in config are provided 1`] = `
 <div
@@ -146,15 +390,25 @@ exports[`VisualizationCreator renders component when all parameters in config ar
       </WithStyles(MenuItem)>
     </WithStyles(WithFormControlContext(Select))>
   </WithStyles(FormControl)>
-  <Component
-    disabled={false}
-    label="Source"
-    onChange={[Function]}
-    placeholder="File path or path pattern of data within GCS."
-    required={true}
-    value=""
-    variant="outlined"
-  />
+  <WithStyles(Grid)
+    container={true}
+    spacing={8}
+  >
+    <WithStyles(Grid)
+      item={true}
+      xs={12}
+    >
+      <Component
+        disabled={false}
+        label="Source"
+        onChange={[Function]}
+        placeholder="File path or path pattern of data within GCS."
+        required={true}
+        value=""
+        variant="outlined"
+      />
+    </WithStyles(Grid)>
+  </WithStyles(Grid)>
   <BusyButton
     busy={false}
     disabled={true}
@@ -227,15 +481,25 @@ exports[`VisualizationCreator renders component when empty config is provided 1`
       </WithStyles(MenuItem)>
     </WithStyles(WithFormControlContext(Select))>
   </WithStyles(FormControl)>
-  <Component
-    disabled={false}
-    label="Source"
-    onChange={[Function]}
-    placeholder="File path or path pattern of data within GCS."
-    required={true}
-    value=""
-    variant="outlined"
-  />
+  <WithStyles(Grid)
+    container={true}
+    spacing={8}
+  >
+    <WithStyles(Grid)
+      item={true}
+      xs={12}
+    >
+      <Component
+        disabled={false}
+        label="Source"
+        onChange={[Function]}
+        placeholder="File path or path pattern of data within GCS."
+        required={true}
+        value=""
+        variant="outlined"
+      />
+    </WithStyles(Grid)>
+  </WithStyles(Grid)>
   <BusyButton
     busy={false}
     disabled={true}
@@ -308,15 +572,25 @@ exports[`VisualizationCreator renders component when isBusy is not provided 1`] 
       </WithStyles(MenuItem)>
     </WithStyles(WithFormControlContext(Select))>
   </WithStyles(FormControl)>
-  <Component
-    disabled={false}
-    label="Source"
-    onChange={[Function]}
-    placeholder="File path or path pattern of data within GCS."
-    required={true}
-    value=""
-    variant="outlined"
-  />
+  <WithStyles(Grid)
+    container={true}
+    spacing={8}
+  >
+    <WithStyles(Grid)
+      item={true}
+      xs={12}
+    >
+      <Component
+        disabled={false}
+        label="Source"
+        onChange={[Function]}
+        placeholder="File path or path pattern of data within GCS."
+        required={true}
+        value=""
+        variant="outlined"
+      />
+    </WithStyles(Grid)>
+  </WithStyles(Grid)>
   <BusyButton
     busy={false}
     disabled={true}
@@ -389,15 +663,116 @@ exports[`VisualizationCreator renders component when onGenerate is not provided 
       </WithStyles(MenuItem)>
     </WithStyles(WithFormControlContext(Select))>
   </WithStyles(FormControl)>
-  <Component
-    disabled={false}
-    label="Source"
-    onChange={[Function]}
-    placeholder="File path or path pattern of data within GCS."
-    required={true}
-    value=""
-    variant="outlined"
+  <WithStyles(Grid)
+    container={true}
+    spacing={8}
+  >
+    <WithStyles(Grid)
+      item={true}
+      xs={12}
+    >
+      <Component
+        disabled={false}
+        label="Source"
+        onChange={[Function]}
+        placeholder="File path or path pattern of data within GCS."
+        required={true}
+        value=""
+        variant="outlined"
+      />
+    </WithStyles(Grid)>
+  </WithStyles(Grid)>
+  <BusyButton
+    busy={false}
+    disabled={true}
+    onClick={[Function]}
+    title="Generate Visualization"
   />
+</div>
+`;
+
+exports[`VisualizationCreator renders component when outputSuggestions is not provided 1`] = `
+<div
+  style={
+    Object {
+      "width": 600,
+    }
+  }
+>
+  <WithStyles(FormControl)
+    style={
+      Object {
+        "width": "100%",
+      }
+    }
+  >
+    <WithStyles(WithFormControlContext(InputLabel))
+      htmlFor="visualization-type-selector"
+      required={true}
+    >
+      Type
+    </WithStyles(WithFormControlContext(InputLabel))>
+    <WithStyles(WithFormControlContext(Select))
+      disabled={false}
+      inputProps={
+        Object {
+          "id": "visualization-type-selector",
+          "name": "Visualization Type",
+        }
+      }
+      onChange={[Function]}
+      style={
+        Object {
+          "minHeight": 60,
+          "width": "100%",
+        }
+      }
+    >
+      <WithStyles(MenuItem)
+        key="ROCCURVE"
+        value="ROC_CURVE"
+      >
+        ROC_CURVE
+      </WithStyles(MenuItem)>
+      <WithStyles(MenuItem)
+        key="TFDV"
+        value="TFDV"
+      >
+        TFDV
+      </WithStyles(MenuItem)>
+      <WithStyles(MenuItem)
+        key="TABLE"
+        value="TABLE"
+      >
+        TABLE
+      </WithStyles(MenuItem)>
+      <WithStyles(MenuItem)
+        key="CUSTOM"
+        value="CUSTOM"
+      >
+        CUSTOM
+      </WithStyles(MenuItem)>
+    </WithStyles(WithFormControlContext(Select))>
+  </WithStyles(FormControl)>
+  <WithStyles(Grid)
+    container={true}
+    spacing={8}
+  >
+    <WithStyles(Grid)
+      item={true}
+      xs={12}
+    >
+      <Component
+        disabled={false}
+        label="Source"
+        onChange={[Function]}
+        placeholder="File path or path pattern of data within GCS."
+        required={true}
+        value=""
+        variant="outlined"
+      />
+    </WithStyles(Grid)>
+  </WithStyles(Grid)>
   <BusyButton
     busy={false}
     disabled={true}
@@ -470,15 +845,25 @@ exports[`VisualizationCreator renders the provided arguments correctly 1`] = `
       </WithStyles(MenuItem)>
     </WithStyles(WithFormControlContext(Select))>
   </WithStyles(FormControl)>
-  <Component
-    disabled={false}
-    label="Source"
-    onChange={[Function]}
-    placeholder="File path or path pattern of data within GCS."
-    required={true}
-    value=""
-    variant="outlined"
-  />
+  <WithStyles(Grid)
+    container={true}
+    spacing={8}
+  >
+    <WithStyles(Grid)
+      item={true}
+      xs={12}
+    >
+      <Component
+        disabled={false}
+        label="Source"
+        onChange={[Function]}
+        placeholder="File path or path pattern of data within GCS."
+        required={true}
+        value=""
+        variant="outlined"
+      />
+    </WithStyles(Grid)>
+  </WithStyles(Grid)>
   <BusyButton
     busy={false}
     disabled={true}
@@ -551,15 +936,25 @@ exports[`VisualizationCreator renders the provided source correctly 1`] = `
       </WithStyles(MenuItem)>
     </WithStyles(WithFormControlContext(Select))>
   </WithStyles(FormControl)>
-  <Component
-    disabled={false}
-    label="Source"
-    onChange={[Function]}
-    placeholder="File path or path pattern of data within GCS."
-    required={true}
-    value="gs://ml-pipeline/data.csv"
-    variant="outlined"
-  />
+  <WithStyles(Grid)
+    container={true}
+    spacing={8}
+  >
+    <WithStyles(Grid)
+      item={true}
+      xs={12}
+    >
+      <Component
+        disabled={false}
+        label="Source"
+        onChange={[Function]}
+        placeholder="File path or path pattern of data within GCS."
+        required={true}
+        value="gs://ml-pipeline/data.csv"
+        variant="outlined"
+      />
+    </WithStyles(Grid)>
+  </WithStyles(Grid)>
   <BusyButton
     busy={false}
     disabled={true}
@@ -633,15 +1028,25 @@ exports[`VisualizationCreator renders the selected visualization type correctly 
       </WithStyles(MenuItem)>
     </WithStyles(WithFormControlContext(Select))>
   </WithStyles(FormControl)>
-  <Component
-    disabled={false}
-    label="Source"
-    onChange={[Function]}
-    placeholder="File path or path pattern of data within GCS."
-    required={true}
-    value=""
-    variant="outlined"
-  />
+  <WithStyles(Grid)
+    container={true}
+    spacing={8}
+  >
+    <WithStyles(Grid)
+      item={true}
+      xs={12}
+    >
+      <Component
+        disabled={false}
+        label="Source"
+        onChange={[Function]}
+        placeholder="File path or path pattern of data within GCS."
+        required={true}
+        value=""
+        variant="outlined"
+      />
+    </WithStyles(Grid)>
+  </WithStyles(Grid)>
   <div>
     <WithStyles(WithFormControlContext(InputLabel))>
       Arguments (Optional)

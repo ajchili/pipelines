@@ -37,6 +37,7 @@ describe('VisualizationCreator', () => {
   it('renders component when isBusy is not provided', () => {
     const config: VisualizationCreatorConfig = {
       onGenerate: jest.fn(),
+      outputSuggestions: [],
       type: PlotType.VISUALIZATION_CREATOR,
     };
     const tree = shallow(<VisualizationCreator configs={[config]} />);
@@ -46,6 +47,17 @@ describe('VisualizationCreator', () => {
   it('renders component when onGenerate is not provided', () => {
     const config: VisualizationCreatorConfig = {
       isBusy: false,
+      outputSuggestions: [],
+      type: PlotType.VISUALIZATION_CREATOR,
+    };
+    const tree = shallow(<VisualizationCreator configs={[config]} />);
+    expect(tree).toMatchSnapshot();
+  });
+
+  it('renders component when outputSuggestions is not provided', () => {
+    const config: VisualizationCreatorConfig = {
+      isBusy: false,
+      onGenerate: jest.fn(),
       type: PlotType.VISUALIZATION_CREATOR,
     };
     const tree = shallow(<VisualizationCreator configs={[config]} />);
@@ -56,6 +68,7 @@ describe('VisualizationCreator', () => {
     const config: VisualizationCreatorConfig = {
       isBusy: false,
       onGenerate: jest.fn(),
+      outputSuggestions: [],
       type: PlotType.VISUALIZATION_CREATOR,
     };
     const tree = shallow(<VisualizationCreator configs={[config]} />);
@@ -197,9 +210,37 @@ describe('VisualizationCreator', () => {
     expect(tree).toMatchSnapshot();
   });
 
+  it('renders an output select input field when outputSuggestions are specified', () => {
+    const config: VisualizationCreatorConfig = {
+      outputSuggestions: [
+        'gs://ml-pipeline/table.csv',
+        'gs://ml-pipeline/roc.csv'
+      ],
+      type: PlotType.VISUALIZATION_CREATOR,
+    };
+    const tree = shallow(<VisualizationCreator configs={[config]} />);
+    expect(tree).toMatchSnapshot();
+  });
+
   it('disables all select and input fields when busy', () => {
     const config: VisualizationCreatorConfig = {
       isBusy: true,
+      type: PlotType.VISUALIZATION_CREATOR,
+    };
+    const tree = shallow(<VisualizationCreator configs={[config]} />);
+    // toMatchSnapshot is used rather than three individual checks for the
+    // disabled prop due to an issue where the Input components are not
+    // selectable by tree.find().
+    expect(tree).toMatchSnapshot();
+  });
+
+  it('disables all select and input fields when busy and outputSuggestions are provided', () => {
+    const config: VisualizationCreatorConfig = {
+      isBusy: true,
+      outputSuggestions: [
+        'gs://ml-pipeline/table.csv',
+        'gs://ml-pipeline/roc.csv'
+      ],
       type: PlotType.VISUALIZATION_CREATOR,
     };
     const tree = shallow(<VisualizationCreator configs={[config]} />);

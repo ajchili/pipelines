@@ -18,6 +18,7 @@ import * as React from 'react';
 import 'brace';
 import BusyButton from '../../atoms/BusyButton';
 import FormControl from '@material-ui/core/FormControl';
+import Grid from '@material-ui/core/Grid';
 import Input from '../../atoms/Input';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -35,6 +36,7 @@ export interface VisualizationCreatorConfig extends ViewerConfig {
   isBusy?: boolean;
   // Function called to generate a visualization.
   onGenerate?: (visualizationArguments: string, source: string, type: ApiVisualizationType) => void;
+  outputSuggestions?: string[];
 }
 
 interface VisualizationCreatorProps {
@@ -85,6 +87,16 @@ class VisualizationCreator extends Viewer<VisualizationCreatorProps, Visualizati
     return 'Visualization Creator';
   }
 
+  public renderSuggestion(suggestion: string): JSX.Element {
+    return (
+      <MenuItem component='div'>
+        <span style={{ fontWeight: 400 }}>
+          {suggestion}
+        </span>
+      </MenuItem>
+    );
+  }
+
   public render(): JSX.Element | null {
     const { configs } = this.props;
     const config = configs[0];
@@ -94,7 +106,7 @@ class VisualizationCreator extends Viewer<VisualizationCreatorProps, Visualizati
       return null;
     }
 
-    const { isBusy = false, onGenerate } = config;
+    const { isBusy = false, onGenerate, outputSuggestions = [] } = config;
 
     // Only allow a visualization to be generated if one is not already being
     // generated (as indicated by the isBusy tag), and if there is an source
@@ -141,12 +153,31 @@ class VisualizationCreator extends Viewer<VisualizationCreatorProps, Visualizati
             ))}
         </Select>
       </FormControl>
-
-      <Input label='Source' variant={'outlined'} value={source}
-        disabled={isBusy}
-        placeholder='File path or path pattern of data within GCS.'
-        required={selectedType !== ApiVisualizationType.CUSTOM}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.setState({ source: e.target.value })} />
+      
+      <Grid container={true} spacing={8}>
+        <Grid item={true} xs={!!outputSuggestions.length ? 9 : 12}>
+          <Input label='Source' variant={'outlined'} value={source}
+            disabled={isBusy}
+            placeholder='File path or path pattern of data within GCS.'
+            required={selectedType !== ApiVisualizationType.CUSTOM}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.setState({ source: e.target.value })} />
+        </Grid>
+        {!!outputSuggestions.length &&
+          <Grid item={true} xs={3}>
+            <Input
+              select={true} variant={'outlined'} disabled={isBusy} label='Outputs'
+              value={source}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.setState({ source: e.target.value })}
+            >
+              {outputSuggestions.map((suggestion: string, i: number) => (
+                <MenuItem key={i} value={suggestion}>
+                  {suggestion}
+                </MenuItem>
+              ))}
+            </Input>
+          </Grid>
+        }
+      </Grid>
       {selectedType === ApiVisualizationType.CUSTOM &&
         <div>
           <InputLabel>Custom Visualization Code</InputLabel>

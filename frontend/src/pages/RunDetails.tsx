@@ -189,6 +189,7 @@ class RunDetails extends Page<RunDetailsProps, RunDetailsState> {
 
     const workflowParameters = WorkflowParser.getParameters(workflow);
     const nodeInputOutputParams = WorkflowParser.getNodeInputOutputParams(workflow, selectedNodeId);
+    const outputSuggestions = nodeInputOutputParams[1].map(params => params[1]);
     const hasMetrics = runMetadata && runMetadata.metrics && runMetadata.metrics.length > 0;
 
     return (
@@ -256,6 +257,7 @@ class RunDetails extends Page<RunDetailsProps, RunDetailsState> {
                                         this.setState({ isGeneratingVisualization: false });
                                       });
                                   },
+                                  outputSuggestions,
                                   type: PlotType.VISUALIZATION_CREATOR,
                                 } as VisualizationCreatorConfig]}
                                   title={VisualizationCreator.prototype.getDisplayName()}
