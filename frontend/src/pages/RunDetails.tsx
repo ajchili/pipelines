@@ -232,24 +232,19 @@ class RunDetails extends Page<RunDetailsProps, RunDetailsState> {
                                       return;
                                     }
                                     this.setState({ isGeneratingVisualization: true });
-                                    const visualization: ApiVisualization = {
+                                    const visualizationData: ApiVisualization = {
                                       arguments: visualizationArguments,
-                                      source: type === ApiVisualizationType.CUSTOM ? 'gs://kirinpatel/data.csv' : source,
+                                      source,
                                       type,
                                     };
-                                    Apis.visualizationServiceApi.createVisualization(visualization)
-                                      .then((_visualization: ApiVisualization) => {
-                                        if (_visualization.html) {
-                                          const config: HTMLViewerConfig = {
-                                            htmlContent: _visualization.html,
-                                            type: PlotType.WEB_APP,
-                                          };
-                                          if (!selectedNodeDetails.viewerConfigs) {
-                                            selectedNodeDetails.viewerConfigs = [];
-                                          }
-                                          selectedNodeDetails.viewerConfigs.push(config);
-                                          this.setState({ selectedNodeDetails });
+
+                                    OutputArtifactLoader.buildPythonVisualizationConfig(visualizationData)
+                                      .then((config: HTMLViewerConfig) => {
+                                        if (!selectedNodeDetails.viewerConfigs) {
+                                          selectedNodeDetails.viewerConfigs = [];
                                         }
+                                        selectedNodeDetails.viewerConfigs.push(config);
+                                        this.setState({ selectedNodeDetails });
                                       })
                                       // tslint:disable-next-line:no-console
                                       .catch(console.error)

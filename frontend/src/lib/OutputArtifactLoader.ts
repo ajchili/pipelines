@@ -25,7 +25,7 @@ import { ROCCurveConfig } from '../components/viewers/ROCCurve';
 import { TensorboardViewerConfig } from '../components/viewers/Tensorboard';
 import { csvParseRows } from 'd3-dsv';
 import { logger, errorToMessage } from './Utils';
-import { ApiVisualizationType } from 'src/apis/visualization';
+import { ApiVisualization, ApiVisualizationType } from 'src/apis/visualization';
 
 export interface PlotMetadata {
   format?: 'csv';
@@ -74,13 +74,13 @@ export class OutputArtifactLoader {
           case (PlotType.MARKDOWN):
             return await this.buildMarkdownViewerConfig(metadata);
           case (PlotType.TABLE):
-            return await this.buildPythonVisualizationConfig(metadata, ApiVisualizationType.TABLE);
+            return await this.buildPythonVisualizationConfigFromMetadata(metadata, ApiVisualizationType.TABLE);
           case (PlotType.TENSORBOARD):
             return await this.buildTensorboardConfig(metadata);
           case (PlotType.WEB_APP):
             return await this.buildHtmlViewerConfig(metadata);
           case (PlotType.ROC):
-            return await this.buildPythonVisualizationConfig(metadata, ApiVisualizationType.ROCCURVE);
+            return await this.buildPythonVisualizationConfigFromMetadata(metadata, ApiVisualizationType.ROCCURVE);
           default:
             logger.error('Unknown plot type: ' + metadata.type);
             return null;
@@ -252,24 +252,35 @@ export class OutputArtifactLoader {
     };
   }
 
-  public static async buildPythonVisualizationConfig(metadata: PlotMetadata, type: ApiVisualizationType): Promise<ViewerConfig> {
+  public static async buildPythonVisualizationConfig(visualizationData: ApiVisualization): Promise<HTMLViewerConfig> {
+    const visualization = await Apis.visualizationServiceApi.createVisualization(visualizationData);
+    if (visualization.html) {
+      const htmlContent = visualization.html
+        // Fixes issue with TFX components (and other iframe based
+        // visualizations), where the method in which javascript interacts
+        // with embedded iframes is not allowed when embedded in an additional
+        // iframe. This is resolved by setting the srcdoc value rather that
+        // manipulating the document directly.
+        .replace('contentWindow.document.write', 'srcdoc=');
+      return {
+        htmlContent,
+        type: PlotType.WEB_APP,
+      } as HTMLViewerConfig;
+    } else {
+      throw new Error('Unable to generate visualization!');
+    }
+  }
+
+  public static async buildPythonVisualizationConfigFromMetadata(metadata: PlotMetadata, type: ApiVisualizationType): Promise<ViewerConfig> {
     if (!metadata.source) {
       throw new Error('Malformed metadata, property "source" is required.');
     }
     try {
-      const visualization = await Apis.visualizationServiceApi.createVisualization({
+      return await this.buildPythonVisualizationConfig({
         arguments: this.getPythonArgumentsForVisualizationType(metadata, type),
         source: metadata.source,
         type,
       });
-      if (visualization.html) {
-        return {
-          htmlContent: visualization.html,
-          type: PlotType.WEB_APP,
-        } as HTMLViewerConfig;
-      } else {
-        throw new Error('Unable to generate visualization!');
-      }
     } catch (err) {
       // Determine type and fall back to previous visualization method.
       // If no type can be determined, default to html.
