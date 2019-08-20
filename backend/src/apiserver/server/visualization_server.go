@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/cenkalti/backoff"
 	"github.com/kubeflow/pipelines/backend/api/go_client"
 	"github.com/kubeflow/pipelines/backend/src/apiserver/resource"
 	"github.com/kubeflow/pipelines/backend/src/common/util"
@@ -11,11 +12,13 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
 )
 
 type VisualizationServer struct {
-	resourceManager *resource.ResourceManager
-	serviceURL      string
+	resourceManager    *resource.ResourceManager
+	serviceURL         string
+	isServiceAvailable bool
 }
 
 func (s *VisualizationServer) CreateVisualization(ctx context.Context, request *go_client.CreateVisualizationRequest) (*go_client.Visualization, error) {
@@ -56,6 +59,12 @@ func (s *VisualizationServer) validateCreateVisualizationRequest(request *go_cli
 // service to generate HTML visualizations from a request.
 // It returns the generated HTML as a string and any error that is encountered.
 func (s *VisualizationServer) generateVisualizationFromRequest(request *go_client.CreateVisualizationRequest) ([]byte, error) {
+	if !s.isServiceAvailable {
+		return nil, util.NewInternalServerError(
+			fmt.Errorf("service not available"),
+			"Service not available",
+		)
+	}
 	visualizationType := strings.ToLower(go_client.Visualization_Type_name[int32(request.Visualization.Type)])
 	var arguments string
 	if request.Visualization.Type == go_client.Visualization_CUSTOM && len(request.Visualization.Source) == 0 {
@@ -78,6 +87,26 @@ func (s *VisualizationServer) generateVisualizationFromRequest(request *go_clien
 	return body, nil
 }
 
-func NewVisualizationServer(resourceManager *resource.ResourceManager) *VisualizationServer {
-	return &VisualizationServer{resourceManager: resourceManager, serviceURL: "http://visualization-service.kubeflow"}
+func isVisualizationServiceAlive(serviceURL string, initConnectionTimeout time.Duration) bool {
+	var operation = func() error {
+		_, err := http.Get(serviceURL)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+	b := backoff.NewExponentialBackOff()
+	b.MaxElapsedTime = initConnectionTimeout
+	err := backoff.Retry(operation, b)
+	return err == nil
+}
+
+func NewVisualizationServer(resourceManager *resource.ResourceManager, serviceName string, namespace string, initConnectionTimeout time.Duration) *VisualizationServer {
+	serviceURL := fmt.Sprintf("http://%s.%s", serviceName, namespace)
+	isServiceAvailable := isVisualizationServiceAlive(serviceURL, initConnectionTimeout)
+	return &VisualizationServer{
+		resourceManager:    resourceManager,
+		serviceURL:         serviceURL,
+		isServiceAvailable: isServiceAvailable,
+	}
 }
