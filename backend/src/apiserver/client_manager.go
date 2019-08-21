@@ -17,10 +17,11 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	v1 "k8s.io/client-go/kubernetes/typed/core/v1"
 	"os"
 	"strconv"
 	"time"
+
+	v1 "k8s.io/client-go/kubernetes/typed/core/v1"
 
 	workflowclient "github.com/argoproj/argo/pkg/client/clientset/versioned/typed/workflow/v1alpha1"
 	"github.com/cenkalti/backoff"
@@ -41,18 +42,19 @@ import (
 )
 
 const (
-	minioServiceHost      = "MINIO_SERVICE_SERVICE_HOST"
-	minioServicePort      = "MINIO_SERVICE_SERVICE_PORT"
-	mysqlServiceHost      = "MYSQL_SERVICE_HOST"
-	mysqlServicePort      = "MYSQL_SERVICE_PORT"
-	mysqlUser             = "DBConfig.User"
-	mysqlPassword         = "DBConfig.Password"
-	mysqlDBName           = "DBConfig.DBName"
+	minioServiceHost = "MINIO_SERVICE_SERVICE_HOST"
+	minioServicePort = "MINIO_SERVICE_SERVICE_PORT"
+	mysqlServiceHost = "MYSQL_SERVICE_HOST"
+	mysqlServicePort = "MYSQL_SERVICE_PORT"
+	mysqlUser        = "DBConfig.User"
+	mysqlPassword    = "DBConfig.Password"
+	mysqlDBName      = "DBConfig.DBName"
 
 	podNamespace          = "POD_NAMESPACE"
 	initConnectionTimeout = "InitConnectionTimeout"
 
-	visualizationServiceHost = "ML_VISUALIZATION_SERVICE_HOST"
+	visualizationServiceHost = "ML_PIPELINE_VISUALIZATIONSERVER_SERVICE_HOST"
+	visualizationServicePort = "ML_PIPELINE_VISUALIZATIONSERVER_SERVICE_PORT_HTTP"
 )
 
 // Container for all service clients
@@ -68,7 +70,7 @@ type ClientManager struct {
 	objectStore            storage.ObjectStoreInterface
 	wfClient               workflowclient.WorkflowInterface
 	swfClient              scheduledworkflowclient.ScheduledWorkflowInterface
-	podClient 						 v1.PodInterface
+	podClient              v1.PodInterface
 	time                   util.TimeInterface
 	uuid                   util.UUIDGeneratorInterface
 

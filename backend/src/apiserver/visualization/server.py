@@ -96,7 +96,7 @@ class VisualizationHandler(tornado.web.RequestHandler):
         """
         if arguments.type is None:
             raise Exception("No type specified.")
-        if arguments.source is None:
+        if arguments.type != "custom" and arguments.source is None:
             raise Exception("No source specified.")
         try:
             json.loads(arguments.arguments)

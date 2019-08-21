@@ -18,9 +18,9 @@ converting those objects to HTML.
 # limitations under the License.
 
 from enum import Enum
-import json
 from pathlib import Path
 from typing import Text
+import urllib.parse
 from jupyter_client import KernelManager
 from nbconvert import HTMLExporter
 from nbconvert.preprocessors import ExecutePreprocessor
@@ -103,10 +103,8 @@ class Exporter:
 
     @staticmethod
     def create_cell_from_arbitrary_code(variables: dict) -> NotebookNode:
-        if variables["code"] is not None:
-            return new_code_cell("\n".join(variables["code"]))
-
-        return new_code_cell()
+        code = variables.get("code", [])
+        return new_code_cell(urllib.request.unquote("\n".join(code)))
 
     @staticmethod
     def create_cell_from_file(filepath: Text) -> NotebookNode:

@@ -4,15 +4,18 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/cenkalti/backoff"
-	"github.com/kubeflow/pipelines/backend/api/go_client"
-	"github.com/kubeflow/pipelines/backend/src/apiserver/resource"
-	"github.com/kubeflow/pipelines/backend/src/common/util"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
 	"time"
+
+	"github.com/golang/glog"
+
+	"github.com/cenkalti/backoff"
+	"github.com/kubeflow/pipelines/backend/api/go_client"
+	"github.com/kubeflow/pipelines/backend/src/apiserver/resource"
+	"github.com/kubeflow/pipelines/backend/src/common/util"
 )
 
 type VisualizationServer struct {
@@ -70,7 +73,7 @@ func (s *VisualizationServer) generateVisualizationFromRequest(request *go_clien
 	if request.Visualization.Type == go_client.Visualization_CUSTOM && len(request.Visualization.Source) == 0 {
 		arguments = fmt.Sprintf("--type %s --arguments '%s'", visualizationType, request.Visualization.Arguments)
 	} else {
-		arguments = fmt.Sprintf("--type %s --source %s --arguments '%s'", visualizationType, request.Visualization.Source, request.Visualization.Arguments)
+		arguments = fmt.Sprintf("--type %s --source %s --arguments %q", visualizationType, request.Visualization.Source, url.QueryEscape(request.Visualization.Arguments))
 	}
 	resp, err := http.PostForm(s.serviceURL, url.Values{"arguments": {arguments}})
 	if err != nil {
@@ -91,6 +94,7 @@ func isVisualizationServiceAlive(serviceURL string, initConnectionTimeout time.D
 	var operation = func() error {
 		_, err := http.Get(serviceURL)
 		if err != nil {
+			glog.Error("Unable to verify visualization service is alive!", err)
 			return err
 		}
 		return nil
@@ -101,8 +105,8 @@ func isVisualizationServiceAlive(serviceURL string, initConnectionTimeout time.D
 	return err == nil
 }
 
-func NewVisualizationServer(resourceManager *resource.ResourceManager, serviceName string, namespace string, initConnectionTimeout time.Duration) *VisualizationServer {
-	serviceURL := fmt.Sprintf("http://%s.%s", serviceName, namespace)
+func NewVisualizationServer(resourceManager *resource.ResourceManager, ipAddress string, port string, initConnectionTimeout time.Duration) *VisualizationServer {
+	serviceURL := fmt.Sprintf("http://%s:%s", ipAddress, port)
 	isServiceAvailable := isVisualizationServiceAlive(serviceURL, initConnectionTimeout)
 	return &VisualizationServer{
 		resourceManager:    resourceManager,
