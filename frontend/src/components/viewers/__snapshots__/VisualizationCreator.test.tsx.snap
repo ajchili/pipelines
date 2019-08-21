@@ -188,13 +188,13 @@ exports[`VisualizationCreator disables all select and input fields when busy and
           key="0"
           value="gs://ml-pipeline/table.csv"
         >
-          gs://ml-pipeline/table.csv
+          table
         </WithStyles(MenuItem)>
         <WithStyles(MenuItem)
           key="1"
           value="gs://ml-pipeline/roc.csv"
         >
-          gs://ml-pipeline/roc.csv
+          roc_curve
         </WithStyles(MenuItem)>
       </Component>
     </WithStyles(Grid)>
@@ -307,13 +307,13 @@ exports[`VisualizationCreator renders an output select input field when outputSu
           key="0"
           value="gs://ml-pipeline/table.csv"
         >
-          gs://ml-pipeline/table.csv
+          table
         </WithStyles(MenuItem)>
         <WithStyles(MenuItem)
           key="1"
           value="gs://ml-pipeline/roc.csv"
         >
-          gs://ml-pipeline/roc.csv
+          roc_curve
         </WithStyles(MenuItem)>
       </Component>
     </WithStyles(Grid)>

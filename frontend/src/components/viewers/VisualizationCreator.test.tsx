@@ -213,8 +213,8 @@ describe('VisualizationCreator', () => {
   it('renders an output select input field when outputSuggestions are specified', () => {
     const config: VisualizationCreatorConfig = {
       outputSuggestions: [
-        'gs://ml-pipeline/table.csv',
-        'gs://ml-pipeline/roc.csv'
+        { key: 'table', value: 'gs://ml-pipeline/table.csv' },
+        { key: 'roc_curve', value: 'gs://ml-pipeline/roc.csv' }
       ],
       type: PlotType.VISUALIZATION_CREATOR,
     };
@@ -238,8 +238,8 @@ describe('VisualizationCreator', () => {
     const config: VisualizationCreatorConfig = {
       isBusy: true,
       outputSuggestions: [
-        'gs://ml-pipeline/table.csv',
-        'gs://ml-pipeline/roc.csv'
+        { key: 'table', value: 'gs://ml-pipeline/table.csv' },
+        { key: 'roc_curve', value: 'gs://ml-pipeline/roc.csv' }
       ],
       type: PlotType.VISUALIZATION_CREATOR,
     };

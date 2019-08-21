@@ -47,7 +47,7 @@ import { componentMap } from '../components/viewers/ViewerContainer';
 import { flatten } from 'lodash';
 import { formatDateString, getRunDurationFromWorkflow, logger, errorToMessage } from '../lib/Utils';
 import { statusToIcon } from './Status';
-import VisualizationCreator, { VisualizationCreatorConfig } from 'src/components/viewers/VisualizationCreator';
+import VisualizationCreator, { OutputSuggestion, VisualizationCreatorConfig } from 'src/components/viewers/VisualizationCreator';
 import { ApiVisualization, ApiVisualizationType } from 'src/apis/visualization';
 import { HTMLViewerConfig } from 'src/components/viewers/HTMLViewer';
 
@@ -189,7 +189,12 @@ class RunDetails extends Page<RunDetailsProps, RunDetailsState> {
 
     const workflowParameters = WorkflowParser.getParameters(workflow);
     const nodeInputOutputParams = WorkflowParser.getNodeInputOutputParams(workflow, selectedNodeId);
-    const outputSuggestions = nodeInputOutputParams[1].map(params => params[1]);
+    const outputSuggestions = nodeInputOutputParams[1].map(outputParam => {
+      return {
+        key: outputParam[0],
+        value: outputParam[1]
+      } as OutputSuggestion;
+    });
     const hasMetrics = runMetadata && runMetadata.metrics && runMetadata.metrics.length > 0;
 
     return (

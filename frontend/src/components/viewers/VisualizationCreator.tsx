@@ -31,12 +31,17 @@ import 'brace/mode/json';
 import 'brace/mode/python';
 import 'brace/theme/github';
 
+export interface OutputSuggestion {
+  key: string;
+  value: string;
+}
+
 export interface VisualizationCreatorConfig extends ViewerConfig {
   // Whether there is currently a visualization being generated or not.
   isBusy?: boolean;
   // Function called to generate a visualization.
   onGenerate?: (visualizationArguments: string, source: string, type: ApiVisualizationType) => void;
-  outputSuggestions?: string[];
+  outputSuggestions?: OutputSuggestion[];
 }
 
 interface VisualizationCreatorProps {
@@ -169,9 +174,9 @@ class VisualizationCreator extends Viewer<VisualizationCreatorProps, Visualizati
               value={source}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.setState({ source: e.target.value })}
             >
-              {outputSuggestions.map((suggestion: string, i: number) => (
-                <MenuItem key={i} value={suggestion}>
-                  {suggestion}
+              {outputSuggestions.map((suggestion: OutputSuggestion, i: number) => (
+                <MenuItem key={i} value={suggestion.value}>
+                  {suggestion.key}
                 </MenuItem>
               ))}
             </Input>
