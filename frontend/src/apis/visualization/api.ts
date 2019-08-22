@@ -134,12 +134,6 @@ export interface ApiVisualization {
      * @memberof ApiVisualization
      */
     html?: string;
-    /**
-     * In case any error happens when generating visualizations, only visualization ID and the error message are returned. Client has the flexibility of choosing how to handle the error.
-     * @type {string}
-     * @memberof ApiVisualization
-     */
-    error?: string;
 }
 
 /**

@@ -96,9 +96,4 @@ message Visualization {
 
   // Output. Generated visualization html.
   string html = 4;
-
-  // In case any error happens when generating visualizations, only
-  // visualization ID and the error message are returned. Client has the
-  // flexibility of choosing how to handle the error.
-  string error = 5;
 }

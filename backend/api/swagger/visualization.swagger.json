@@ -84,10 +84,6 @@
         "html": {
           "type": "string",
           "description": "Output. Generated visualization html."
-        },
-        "error": {
-          "type": "string",
-          "description": "In case any error happens when generating visualizations, only\nvisualization ID and the error message are returned. Client has the\nflexibility of choosing how to handle the error."
         }
       }
     },
