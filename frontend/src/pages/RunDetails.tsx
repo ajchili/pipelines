@@ -47,7 +47,7 @@ import { componentMap } from '../components/viewers/ViewerContainer';
 import { flatten } from 'lodash';
 import { formatDateString, getRunDurationFromWorkflow, logger, errorToMessage } from '../lib/Utils';
 import { statusToIcon } from './Status';
-import VisualizationCreator, { VisualizationCreatorConfig } from '../components/viewers/VisualizationCreator';
+import VisualizationCreator, { OutputSuggestion, VisualizationCreatorConfig } from '../components/viewers/VisualizationCreator';
 import { ApiVisualization, ApiVisualizationType } from '../apis/visualization';
 import { HTMLViewerConfig } from '../components/viewers/HTMLViewer';
 
@@ -201,12 +201,19 @@ class RunDetails extends Page<RunDetailsProps, RunDetailsState> {
     const workflowParameters = WorkflowParser.getParameters(workflow);
     const nodeInputOutputParams = WorkflowParser.getNodeInputOutputParams(workflow, selectedNodeId);
     const hasMetrics = runMetadata && runMetadata.metrics && runMetadata.metrics.length > 0;
+    const outputSuggestions = nodeInputOutputParams[1].map(outputParam => {
+      return {
+        key: outputParam[0],
+        value: outputParam[1]
+      } as OutputSuggestion;
+    });
     const visualizationCreatorConfig: VisualizationCreatorConfig = {
       allowCustomVisualizations,
       isBusy: isGeneratingVisualization,
       onGenerate: (visualizationArguments: string, source: string, type: ApiVisualizationType) => {
         this._onGenerate(visualizationArguments, source, type);
       },
+      outputSuggestions,
       type: PlotType.VISUALIZATION_CREATOR,
     };
 

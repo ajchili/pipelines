@@ -135,6 +135,11 @@ class VisualizationHandler(tornado.web.RequestHandler):
             request_arguments.get("source"),
             request_arguments.get("type")
         )
+        if request_arguments.get("type") != "custom":
+            _exporter.template_type = exporter.TemplateType.FULL_NO_ERROR
+        else:
+            _exporter.template_type = exporter.TemplateType.FULL
+
         # Generate visualization (output for notebook).
         html = _exporter.generate_html_from_notebook(nb)
         self.write(html)

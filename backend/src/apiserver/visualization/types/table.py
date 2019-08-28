@@ -14,7 +14,7 @@
 
 # gcsfs is required for pandas GCS integration.
 import gcsfs
-from itables import show
+from itables import show, load_datatables
 # itables is requires as importing it changes the way pandas DataFrames are
 # rendered.
 import itables.interactive
@@ -23,6 +23,8 @@ import pandas as pd
 from tensorflow.python.lib.io import file_io
 
 # flake8: noqa TODO
+
+load_datatables()
 
 # Remove maxByte limit to prevent issues where entire table cannot be rendered
 # due to size of data.

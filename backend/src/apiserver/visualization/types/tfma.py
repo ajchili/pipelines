@@ -14,9 +14,16 @@
 
 import tensorflow_model_analysis as tfma
 
+eval_shared_model = tfma.default_eval_shared_model(eval_saved_model_path=source)
+eval_result = tfma.run_model_analysis(
+    eval_shared_model=eval_shared_model,
+    data_location=source,
+    file_format='tfrecords')
+
 if variables.get("slicing_column", False) == False:
-    tfma.view.render_slicing_metrics(source)
+    tfma.view.render_slicing_metrics(eval_result)
 else:
-    tfma.view.render_slicing_metrics(source, slicing_column=variables.get("slicing_column"))
+    tfma.view.render_slicing_metrics(eval_result,
+                                     slicing_column=variables.get("slicing_column"))
 
 
